@@ -1,0 +1,14 @@
+name: mmoChat
+main: mmo.Chat.mmoChat
+version: 0.1
+website: http://forums.bukkit.org/threads/
+author: Rycochet <rycochet@rycochet.com>
+depend: [mmoCore]
+
+description: Utility functions for mmo-minecraft
+
+commands:
+  channel:
+    description: Turn on or off channels, or set the default channel for speaking
+    aliases: [ch,mmochat]
+    usage: /channel <name>
