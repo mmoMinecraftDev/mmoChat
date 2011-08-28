@@ -16,41 +16,26 @@
  */
 package mmo.Chat;
 
-import java.util.Collection;
+import java.util.HashSet;
+import mmo.Core.mmoChatEvent;
+import mmo.Core.mmoListener;
 import org.bukkit.entity.Player;
 
-public class ChannelReply implements ChatFilter {
+public class ChannelReply extends mmoListener {
 
 	@Override
-	public String getName() {
-		return "Reply";
-	}
-
-	@Override
-	public Collection<Player> getRecipients(Player from, String message) {
-		String to = null;
-		for (String each : ChannelTell.tells.keySet()) {
-			if (ChannelTell.tells.get(each).equalsIgnoreCase(from.getName())) {
-				to = each;
-				break;
+	public void onMMOChat(mmoChatEvent event) {
+		if (event.hasFilter("Reply")) {
+			HashSet<Player> recipients = event.getRecipients();
+			recipients.clear();
+			Player from = event.getPlayer();
+			String name = ChannelTell.tells.get(from.getName());
+			if (name != null) {
+				Player to = mmoChat.mmo.server.getPlayer(name);
+				ChannelTell.tells.put(to.getName(), from.getName());
+				recipients.add(from);
+				recipients.add(to);
 			}
 		}
-		if (to != null) {
-			ChannelTell.tells.put(from.getName(), to);
-		}
-		return null;
-	}
-
-	@Override
-	public String checkRecipient(Player from, Player to, String message) {
-		String name = ChannelTell.tells.get(from.getName());
-		if (name != null) {
-			if (name.equalsIgnoreCase(to.getName())) {
-				return message;
-			} else if (from.equals(to)) {
-				return "(to " + mmoChat.mmo.getColor(to, from) + name + "&f) " + message;
-			}
-		}
-		return null;
 	}
 }

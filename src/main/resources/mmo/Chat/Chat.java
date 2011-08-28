@@ -16,28 +16,24 @@
  */
 package mmo.Chat;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.Set;
 import mmo.Core.ArrayListString;
+import mmo.Core.mmo;
 import org.bukkit.entity.Player;
 
 public class Chat {
 
 	private final static ArrayListString channelList = new ArrayListString();
-	private final static HashMap<String, ChatFilter> filterList = new HashMap<String, ChatFilter>();
 	private final static HashMap<String, String> playerChannel = new HashMap<String, String>();
 	private final static HashMap<String, ArrayListString> playerHidden = new HashMap<String, ArrayListString>();
+	protected static mmo mmo;
 
 	public static void addChannel(String name) {
 		if (!channelList.contains(name)) {
 			channelList.add(name);
 		}
-	}
-
-	public static void addFilter(ChatFilter filter) {
-		filterList.put(filter.getName(), filter);
 	}
 
 	public static boolean doChat(String channel, Player from, String message) {
@@ -47,54 +43,33 @@ public class Chat {
 		ArrayListString check = new ArrayListString();
 		channel = channelList.get(channel);
 		boolean me = false, found = false;
-		int endIndex = message.indexOf(" ");
-		if (endIndex == -1) {
-			endIndex = message.length();
-		}
-		if (message.substring(0, endIndex).equalsIgnoreCase("/me")) {
-			message = message.substring(endIndex).trim();
+		if (mmo.firstWord(message).equalsIgnoreCase("/me")) {
+			message = mmo.removeFirstWord(message);
 			me = true;
 		}
 		if (message.isEmpty()) {
 			setChannel(from, channel);
-			mmoChat.mmo.sendMessage(from, "Channel changed to %s", channel);
+			mmo.sendMessage(from, "Channel changed to %s", channel);
 			return true;
 		}
-		ArrayList<Player> recipients = new ArrayList(Arrays.asList(mmoChat.mmo.server.getOnlinePlayers()));
-		String filters = mmoChat.mmo.cfg.getString("channel." + channel + ".filters", "Server");
-		for (String filter : Arrays.asList(filters.split(","))) {
-			ChatFilter next = filterList.get(filter);
-			if (next != null) {
-				Collection<Player> keep = next.getRecipients(from, message);
-				if (keep != null) {
-					recipients.retainAll(keep);
-				} else {
-					check.add(filter);
-				}
-			} else {
-				return false;
-			}
+		String format = mmo.cfg.getString("channel." + channel + ".format" + (me ? "me" : ""), 
+				  mmo.cfg.getString("default.format" + (me ? "me" : ""), me ? "[%1$s] %2$s*&f %3$s %4$s" : "[%1$s] %2$s%3$s&f: %4$s"));
+		ArrayListString filters = new ArrayListString();
+		for (String filter : Arrays.asList(mmo.cfg.getString("channel." + channel + ".filters", "Server").split(","))) {
+			filters.add(filter);
 		}
-		if (mmoChat.mmo.cfg.getBoolean("channel." + channel + ".log", false)) {
-			mmoChat.mmo.log("[%1$s] %2$s: %3$s", channel, from.getName(), message);
-		}
-		for (Player to : recipients) {
-			if (check.isEmpty()) {
-				mmoChat.mmo.sendMessage(false, to, "[%1$s] " + (me ? "%2$s*&f %3$s" : "%2$s%3$s&f:") + " %4$s", channel, mmoChat.mmo.getColor(to, from), from.getName(), message);
-				found = true;
-			} else {
-				for (String filter : check) {
-					ChatFilter next = filterList.get(filter);
-					String msg = next.checkRecipient(from, to, message);
-					if (msg != null && !msg.isEmpty()) {
-						mmoChat.mmo.sendMessage(false, to, "[%1$s] " + (me ? "%2$s*&f %3$s" : "%2$s%3$s&f:") + " %4$s", channel, mmoChat.mmo.getColor(to, from), from.getName(), msg);
-						found = true;
-					}
+		mmoChatEventEvent event = new mmoChatEventEvent(from, filters, format, message);
+		mmoChat.pm.callEvent(event);
+		Set<Player> recipients = event.getRecipients();
+		if (recipients.isEmpty()) {
+			mmo.sendMessage(from, "You seem to be talking to yourself...");
+		} else {
+			for (Player to : recipients) {
+				String msg = event.getMessage(to);
+				if (msg != null && !msg.isEmpty()) {
+					mmo.sendMessage(false, to, format, channel, mmo.getColor(to, from), from.getName(), msg);
 				}
 			}
-		}
-		if (!found) {
-			mmoChat.mmo.sendMessage(from, "You seem to be talking to yourself...");
 		}
 		return true;
 	}
@@ -144,9 +119,9 @@ public class Chat {
 
 	public static String getChannel(Player player) {
 		String channel = playerChannel.get(player.getName());
-		channel = channel == null ? mmoChat.mmo.cfg.getString("default_channel", "Chat") : channel;
+		channel = channel == null ? mmo.cfg.getString("default_channel", "Chat") : channel;
 		if (!channelList.contains(channel)) {
-			mmoChat.mmo.log("ERROR - set 'default_channel' to one that exists...");
+			mmo.log("ERROR - set 'default_channel' to one that exists...");
 			return channelList.get(0);
 		}
 		return channelList.get(channel);

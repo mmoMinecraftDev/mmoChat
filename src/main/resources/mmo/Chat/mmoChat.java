@@ -16,31 +16,19 @@
  */
 package mmo.Chat;
 
-import java.util.Set;
 import mmo.Core.mmo;
-import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Tameable;
-import org.bukkit.entity.Wolf;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
-import org.bukkit.event.entity.EntityListener;
-import org.bukkit.event.entity.EntityTameEvent;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerListener;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.getspout.spoutapi.event.spout.SpoutCraftEnableEvent;
-import org.getspout.spoutapi.event.spout.SpoutListener;
 
 public class mmoChat extends JavaPlugin {
 
@@ -55,7 +43,7 @@ public class mmoChat extends JavaPlugin {
 		pm = server.getPluginManager();
 		description = getDescription();
 
-		mmo = mmo.create(this);
+		Chat.mmo = mmo = mmo.create(this);
 		mmo.mmoChat = true;
 		mmo.setPluginName("Chat");
 
@@ -89,15 +77,15 @@ public class mmoChat extends JavaPlugin {
 		mmo.cfg.getBoolean("channel.Party.log", false);
 		mmo.cfg.getString("channel.Party.filters", "Party");
 
-//		mmo.cfg.getBoolean("channel.Tell.enabled", true);
-//		mmo.cfg.getBoolean("channel.Tell.command", true);
-//		mmo.cfg.getBoolean("channel.Tell.log", false);
-//		mmo.cfg.getString("channel.Tell.filters", "Tell");
+		mmo.cfg.getBoolean("channel.Tell.enabled", true);
+		mmo.cfg.getBoolean("channel.Tell.command", true);
+		mmo.cfg.getBoolean("channel.Tell.log", false);
+		mmo.cfg.getString("channel.Tell.filters", "Tell");
 
-//		mmo.cfg.getBoolean("channel.Reply.enabled", true);
-//		mmo.cfg.getBoolean("channel.Reply.command", true);
-//		mmo.cfg.getBoolean("channel.Reply.log", false);
-//		mmo.cfg.getString("channel.Reply.filters", "Reply");
+		mmo.cfg.getBoolean("channel.Reply.enabled", true);
+		mmo.cfg.getBoolean("channel.Reply.command", true);
+		mmo.cfg.getBoolean("channel.Reply.log", false);
+		mmo.cfg.getString("channel.Reply.filters", "Reply");
 
 		mmo.cfg.save();
 
@@ -105,13 +93,13 @@ public class mmoChat extends JavaPlugin {
 		pm.registerEvent(Type.PLAYER_CHAT, mpl, Priority.Normal, this);
 		pm.registerEvent(Type.PLAYER_COMMAND_PREPROCESS, mpl, Priority.Normal, this);
 
-		Chat.addFilter(new ChannelDisabled());
-		Chat.addFilter(new ChannelSay());
-		Chat.addFilter(new ChannelYell());
-		Chat.addFilter(new ChannelWorld());
-		Chat.addFilter(new ChannelServer());
-//		Chat.addFilter(new ChannelTell());
-//		Chat.addFilter(new ChannelReply());
+		pm.registerEvent(Type.CUSTOM_EVENT, new ChannelDisabled(), Priority.Normal, this);
+		pm.registerEvent(Type.CUSTOM_EVENT, new ChannelSay(), Priority.Normal, this);
+		pm.registerEvent(Type.CUSTOM_EVENT, new ChannelYell(), Priority.Normal, this);
+		pm.registerEvent(Type.CUSTOM_EVENT, new ChannelWorld(), Priority.Normal, this);
+		pm.registerEvent(Type.CUSTOM_EVENT, new ChannelServer(), Priority.Normal, this);
+		pm.registerEvent(Type.CUSTOM_EVENT, new ChannelTell(), Priority.Normal, this);
+		pm.registerEvent(Type.CUSTOM_EVENT, new ChannelReply(), Priority.Normal, this);
 
 		for (String channel : mmo.cfg.getKeys("channel")) {
 			Chat.addChannel(channel);

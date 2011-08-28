@@ -16,23 +16,15 @@
  */
 package mmo.Chat;
 
-import java.util.Collection;
-import org.bukkit.entity.Player;
+import mmo.Core.mmoChatEvent;
+import mmo.Core.mmoListener;
 
-public class ChannelServer implements ChatFilter {
-
-	@Override
-	public String getName() {
-		return "World";
-	}
+public class ChannelServer extends mmoListener {
 
 	@Override
-	public Collection<Player> getRecipients(Player from, String message) {
-		return null;
-	}
-
-	@Override
-	public String checkRecipient(Player from, Player to, String message) {
-		return message;
+	public void onMMOChat(mmoChatEvent event) {
+		if (event.hasFilter("Server")) {
+			// Should really refresh the target list...
+		}
 	}
 }

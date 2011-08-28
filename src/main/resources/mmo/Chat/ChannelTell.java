@@ -16,47 +16,35 @@
  */
 package mmo.Chat;
 
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import mmo.Core.mmoChatEvent;
+import mmo.Core.mmoListener;
 import org.bukkit.entity.Player;
 
-public class ChannelTell implements ChatFilter {
+public class ChannelTell extends mmoListener {
 
 	public static HashMap<String, String> tells = new HashMap<String, String>();
 
 	@Override
-	public String getName() {
-		return "Tell";
-	}
-
-	@Override
-	public Collection<Player> getRecipients(Player from, String message) {
-		int endIndex = message.indexOf(" ");
-		if (endIndex == -1) {
-			endIndex = message.length();
-		}
-		String name = message.substring(0, endIndex);
-		Player to = mmoChat.mmo.server.getPlayer(name);
-		if (to != null) {
-			tells.put(from.getName(), to.getName());
-		} else {
-			tells.remove(from.getName());
-		}
-		return null;
-	}
-
-	@Override
-	public String checkRecipient(Player from, Player to, String message) {
-		String name = tells.get(from.getName());
-		if (name != null) {
-			if (name.equalsIgnoreCase(to.getName())) {
-				int endIndex = message.indexOf(" ");
-				return message.substring(endIndex == -1 ? message.length() : endIndex).trim();
-			} else if (from.equals(to)) {
-				int endIndex = message.indexOf(" ");
-				return "(to " + mmoChat.mmo.getColor(to, from) + name + "&f) " + message.substring(endIndex == -1 ? message.length() : endIndex).trim();
+	public void onMMOChat(mmoChatEvent event) {
+		if (event.hasFilter("Tell")) {
+			HashSet<Player> recipients = event.getRecipients();
+			recipients.clear();
+			Player from = event.getPlayer();
+			String name = mmoChat.mmo.firstWord(event.getMessage());
+			Player to = mmoChat.mmo.server.getPlayer(name);
+//			event.setMessage(mmoChat.mmo.removeFirstWord(event.getMessage()));
+			if (to != null) {
+				tells.put(to.getName(), from.getName());
+				recipients.add(from);
+				recipients.add(to);
+				String message = mmoChat.mmo.removeFirstWord(event.getMessage());
+				event.setMessage(to, "(from " + from.getName() + ") " + message);
+				event.setMessage(from, "(to " + to.getName() + ") " + message);
+			} else {
+				tells.remove(from.getName());
 			}
 		}
-		return null;
 	}
 }

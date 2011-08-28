@@ -16,23 +16,15 @@
  */
 package mmo.Chat;
 
-import java.util.Collection;
-import org.bukkit.entity.Player;
+import mmo.Core.mmoChatEvent;
+import mmo.Core.mmoListener;
 
-public class ChannelDisabled implements ChatFilter {
-
-	@Override
-	public String getName() {
-		return "Disabled";
-	}
+public class ChannelDisabled extends mmoListener {
 
 	@Override
-	public Collection<Player> getRecipients(Player from, String message) {
-		return null;
-	}
-
-	@Override
-	public String checkRecipient(Player from, Player to, String message) {
-		return null;
+	public void onMMOChat(mmoChatEvent event) {
+		if (event.hasFilter("Disabled")) {
+			event.getRecipients().clear();
+		}
 	}
 }

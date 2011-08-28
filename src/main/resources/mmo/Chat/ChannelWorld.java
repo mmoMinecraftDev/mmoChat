@@ -16,23 +16,23 @@
  */
 package mmo.Chat;
 
-import java.util.Collection;
+import java.util.HashSet;
+import mmo.Core.mmoChatEvent;
+import mmo.Core.mmoListener;
 import org.bukkit.entity.Player;
 
-public class ChannelWorld implements ChatFilter {
+public class ChannelWorld extends mmoListener {
 
 	@Override
-	public String getName() {
-		return "Server";
-	}
-
-	@Override
-	public Collection<Player> getRecipients(Player from, String message) {
-		return from.getWorld().getPlayers();
-	}
-
-	@Override
-	public String checkRecipient(Player from, Player to, String message) {
-		return from.getWorld() == to.getWorld() ? message : null;
+	public void onMMOChat(mmoChatEvent event) {
+		if (event.hasFilter("World")) {
+			Player from = event.getPlayer();
+			HashSet<Player> recipients = event.getRecipients();
+			for (Player to : new HashSet<Player>(recipients)) {
+				if (from.getWorld() != to.getWorld()) {
+					recipients.remove(to);
+				}
+			}
+		}
 	}
 }

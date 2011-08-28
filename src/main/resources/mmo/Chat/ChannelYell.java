@@ -16,33 +16,24 @@
  */
 package mmo.Chat;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashSet;
+import mmo.Core.mmoChatEvent;
+import mmo.Core.mmoListener;
 import org.bukkit.entity.Player;
 
-public class ChannelYell implements ChatFilter {
+public class ChannelYell  extends mmoListener {
 
 	@Override
-	public String getName() {
-		return "Yell";
-	}
-
-	@Override
-	public Collection<Player> getRecipients(Player from, String message) {
-		ArrayList<Player> recipients = new ArrayList<Player>();
-		for (Player player : from.getWorld().getPlayers()) {
-			if (from.getLocation().distance(player.getLocation()) < 300) {
-				recipients.add(player);
+	public void onMMOChat(mmoChatEvent event) {
+		if (event.hasFilter("Say")) {
+			Player from = event.getPlayer();
+			HashSet<Player> recipients = event.getRecipients();
+			for (Player to : new HashSet<Player>(recipients)) {
+				if (from.getWorld() != to.getWorld()
+						  || from.getLocation().distance(to.getLocation()) > 300) {
+					recipients.remove(to);
+				}
 			}
 		}
-		return recipients;
-	}
-
-	@Override
-	public String checkRecipient(Player from, Player to, String message) {
-		if (from.getWorld() == to.getWorld() && from.getLocation().distance(to.getLocation()) < 300) {
-			return message;
-		}
-		return null;
 	}
 }
