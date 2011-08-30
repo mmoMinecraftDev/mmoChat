@@ -18,10 +18,14 @@ package mmo.Chat;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 import mmo.Core.ArrayListString;
 import mmo.Core.mmo;
+import mmo.Core.mmoChatEvent;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 
 public class Chat {
 
@@ -40,9 +44,11 @@ public class Chat {
 		if (channel == null) {
 			channel = getChannel(from);
 		}
-		ArrayListString check = new ArrayListString();
 		channel = channelList.get(channel);
-		boolean me = false, found = false;
+		if (!mmo.cfg.getBoolean("channel." + channel + ".enabled", true)) {
+			return false;
+		}
+		boolean me = false;
 		if (mmo.firstWord(message).equalsIgnoreCase("/me")) {
 			message = mmo.removeFirstWord(message);
 			me = true;
@@ -52,8 +58,13 @@ public class Chat {
 			mmo.sendMessage(from, "Channel changed to %s", channel);
 			return true;
 		}
-		String format = mmo.cfg.getString("channel." + channel + ".format" + (me ? "me" : ""), 
-				  mmo.cfg.getString("default.format" + (me ? "me" : ""), me ? "[%1$s] %2$s*&f %3$s %4$s" : "[%1$s] %2$s%3$s&f: %4$s"));
+		String format = mmo.cfg.getString("channel." + channel + ".format" + (me ? "me" : ""));
+		if (format == null) {
+			format = mmo.cfg.getString("default.format" + (me ? "me" : ""));
+		}
+		if (format == null) {
+			format = me ? "[%1$s] * %2$s %4$s" : "[%1$s] %2$s: %4$s";
+		}
 		ArrayListString filters = new ArrayListString();
 		for (String filter : Arrays.asList(mmo.cfg.getString("channel." + channel + ".filters", "Server").split(","))) {
 			filters.add(filter);
@@ -64,10 +75,18 @@ public class Chat {
 		if (recipients.isEmpty()) {
 			mmo.sendMessage(from, "You seem to be talking to yourself...");
 		} else {
+			if (mmo.cfg.getBoolean("channel." + channel + ".log", false)) {
+				mmo.log("[%1$s] %2$s: %3$s", channel, from.getName(), message);
+			}
 			for (Player to : recipients) {
 				String msg = event.getMessage(to);
 				if (msg != null && !msg.isEmpty()) {
-					mmo.sendMessage(false, to, format, channel, mmo.getColor(to, from), from.getName(), msg);
+					String fmt = event.getFormat(to);
+					mmo.sendMessage(false, to, fmt,
+							  channel,
+							  mmo.getColor(to, from) + from.getName() + ChatColor.WHITE,
+							  mmo.getColor(from, to) + to.getName() + ChatColor.WHITE,
+							  msg);
 				}
 			}
 		}
@@ -103,11 +122,35 @@ public class Chat {
 	}
 
 	public static boolean setChannel(Player player, String channel) {
+		return setChannel(player.getName(), channel);
+	}
+
+	public static boolean setChannel(String name, String channel) {
 		if (channelList.contains(channel)) {
-			playerChannel.put(player.getName(), channel);
+			playerChannel.put(name, channel);
+			ChatDB row = mmo.plugin.getDatabase().find(ChatDB.class).where().ieq("player", name).findUnique();
+//			if (party.isParty() || !party.invites.isEmpty()) {
+				if (row == null) {
+					row = new ChatDB();
+					row.setPlayer(name);
+				}
+				row.setChannel(channel);
+				mmo.plugin.getDatabase().save(row);
+//			} else if (row != null) {
+//				mmo.plugin.getDatabase().delete(row);
+//			}
 			return true;
 		}
 		return false;
+	}
+
+	protected static void load() {
+		try {
+			for (ChatDB row : mmo.plugin.getDatabase().find(ChatDB.class).setAutofetch(true).findList()) {
+				playerChannel.put(row.getPlayer(), row.getChannel());
+			}
+		} catch (Exception e) {
+		}
 	}
 
 	public static String findChannel(String channel) {
@@ -125,5 +168,97 @@ public class Chat {
 			return channelList.get(0);
 		}
 		return channelList.get(channel);
+	}
+
+	private static class mmoChatEventEvent extends Event implements mmoChatEvent {
+
+		private final ArrayListString filters;
+		private final HashMap<Player, String> messages = new HashMap<Player, String>();
+		private final HashMap<Player, String> formats = new HashMap<Player, String>();
+		private final HashSet<Player> recipients;
+		protected Player player;
+		private String message;
+		private String format;
+		private boolean cancel = false;
+
+		public mmoChatEventEvent(final Player player, final ArrayListString filters, final String format, final String message) {
+			super("mmoChatEvent");
+			this.recipients = new HashSet<Player>(Arrays.asList(player.getServer().getOnlinePlayers()));
+			this.player = player;
+			this.format = format;
+			this.message = message;
+			this.filters = filters;
+		}
+
+		@Override
+		public boolean hasFilter(String filter) {
+			return filters.contains(filter);
+		}
+
+		@Override
+		public void setMessage(String message) {
+			this.message = message;
+		}
+
+		@Override
+		public void setMessage(Player player, String message) {
+			messages.put(player, message);
+		}
+
+		@Override
+		public String getMessage() {
+			return message;
+		}
+
+		@Override
+		public String getMessage(Player player) {
+			if (messages.containsKey(player)) {
+				return messages.get(player);
+			}
+			return getMessage();
+		}
+
+		@Override
+		public void setFormat(String format) {
+			this.format = format;
+		}
+
+		@Override
+		public void setFormat(Player player, String format) {
+			formats.put(player, format);
+		}
+
+		@Override
+		public String getFormat() {
+			return format;
+		}
+
+		@Override
+		public String getFormat(Player player) {
+			if (formats.containsKey(player)) {
+				return formats.get(player);
+			}
+			return getFormat();
+		}
+
+		@Override
+		public HashSet<Player> getRecipients() {
+			return messages.isEmpty() ? recipients : new HashSet<Player>(messages.keySet());
+		}
+
+		@Override
+		public boolean isCancelled() {
+			return cancel;
+		}
+
+		@Override
+		public void setCancelled(boolean cancel) {
+			this.cancel = cancel;
+		}
+
+		@Override
+		public Player getPlayer() {
+			return player;
+		}
 	}
 }

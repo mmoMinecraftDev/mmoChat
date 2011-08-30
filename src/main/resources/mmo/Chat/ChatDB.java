@@ -16,15 +16,48 @@
  */
 package mmo.Chat;
 
-import mmo.Core.mmoChatEvent;
-import mmo.Core.mmoListener;
+import com.avaje.ebean.validation.NotEmpty;
+import com.avaje.ebean.validation.NotNull;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
-public class ChannelServer extends mmoListener {
+@Entity()
+@Table(name = "mmo_Party")
+public class ChatDB {
 
-	@Override
-	public void onMMOChat(mmoChatEvent event) {
-		if (event.hasFilter("Server")) {
-			// Should really refresh the target list...
-		}
+	@Id
+	@NotNull
+	@NotEmpty
+	private String player;
+
+	@NotNull
+	private String channel;
+
+	@NotNull
+	private String channelList;
+
+	public String getPlayer() {
+		return player;
+	}
+
+	public void setPlayer(String player) {
+		this.player = player;
+	}
+
+	public String getChannel() {
+		return channel;
+	}
+
+	public void setChannel(String channel) {
+		this.channel = channel;
+	}
+
+	public String getChannelList() {
+		return channelList;
+	}
+
+	public void setChannelList(String channelList) {
+		this.channelList = channelList;
 	}
 }
