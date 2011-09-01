@@ -18,18 +18,19 @@ package mmo.Chat;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import mmo.Core.mmo;
-import mmo.Core.mmoChatEvent;
-import mmo.Core.mmoListener;
+
+import mmo.Core.MMO;
+import mmo.Core.MMOChatEvent;
+import mmo.Core.MMOListener;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
-public class Channels extends mmoListener {
+public class Channels extends MMOListener {
 
 	public static HashMap<String, String> tells = new HashMap<String, String>();
 
 	@Override
-	public void onMMOChat(mmoChatEvent event) {
+	public void onMMOChat(MMOChatEvent event) {
 		if (event.hasFilter("Disabled")) {
 			event.getRecipients().clear();
 		}
@@ -69,19 +70,19 @@ public class Channels extends mmoListener {
 		if (isTell || event.hasFilter("Reply")) {
 			HashSet<Player> recipients = new HashSet<Player>();
 			Player from = event.getPlayer();
-			Player to = mmoChat.mmo.server.getPlayer(
+			Player to = MMO.server.getPlayer(
 					  isTell
-					  ? mmoChat.mmo.firstWord(event.getMessage())
+					  ? MMO.firstWord(event.getMessage())
 					  : tells.get(from.getName()));
 			if (isTell) {
-				event.setMessage(mmoChat.mmo.removeFirstWord(event.getMessage()));
+				event.setMessage(MMO.removeFirstWord(event.getMessage()));
 			}
 			if (to != null) {
 				tells.put(to.getName(), from.getName());
 				recipients.add(from);
 				recipients.add(to);
 				event.setFormat(to, event.getFormat().replaceAll("%2\\$s", "%2\\$s&f tells you"));
-				event.setFormat(from, event.getFormat().replaceAll("%2\\$s", "You tell " + mmo.getColor(from, to) + to.getName() + ChatColor.WHITE));
+				event.setFormat(from, event.getFormat().replaceAll("%2\\$s", "You tell " + MMO.getColor(from, to) + to.getName() + ChatColor.WHITE));
 			} else {
 				tells.remove(from.getName());
 			}

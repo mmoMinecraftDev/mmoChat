@@ -16,8 +16,11 @@
  */
 package mmo.Chat;
 
-import mmo.Core.mmo;
-import mmo.Core.mmoPlugin;
+import mmo.Chat.Chat;
+import mmo.Chat.ChatDB;
+import mmo.Core.MMO;
+import mmo.Core.MMOPlugin;
+
 import org.bukkit.Server;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -47,8 +50,8 @@ public class MMOChat extends MMOPlugin {
 		pm = server.getPluginManager();
 		description = getDescription();
 
-		Chat.mmo = mmo = mmo.create(this);
-		mmo.mmoChat = true;
+		Chat.mmo = mmo = MMO.create(this);
+		MMO.mmoChat = true;
 		mmo.setPluginName("Chat");
 
 		mmo.log("loading " + description.getFullName());
@@ -113,7 +116,7 @@ public class MMOChat extends MMOPlugin {
 	public void onDisable() {
 		mmo.log("Disabled " + description.getFullName());
 		mmo.autoUpdate();
-		mmo.mmoChat = false;
+		MMO.mmoChat = false;
 	}
 
 	@Override
@@ -158,7 +161,7 @@ public class MMOChat extends MMOPlugin {
 		@Override
 		public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
 			String message = event.getMessage();
-			String channel = mmo.firstWord(message);
+			String channel = MMO.firstWord(message);
 			if (channel != null && !channel.isEmpty()) {
 				channel = channel.substring(1);
 				if ("me".equalsIgnoreCase(channel)
@@ -166,7 +169,7 @@ public class MMOChat extends MMOPlugin {
 					event.setCancelled(true);
 				} else if ((channel = Chat.findChannel(channel)) != null
 						  && mmo.cfg.getBoolean("channel." + channel + ".command", true)
-						  && Chat.doChat(channel, event.getPlayer(), mmo.removeFirstWord(message))) {
+						  && Chat.doChat(channel, event.getPlayer(), MMO.removeFirstWord(message))) {
 					event.setCancelled(true);
 				}
 			}

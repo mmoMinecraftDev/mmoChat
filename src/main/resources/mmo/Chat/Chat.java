@@ -21,8 +21,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import mmo.Core.ArrayListString;
-import mmo.Core.mmo;
-import mmo.Core.mmoChatEvent;
+import mmo.Core.MMO;
+import mmo.Core.MMOChatEvent;
+
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -32,7 +33,7 @@ public class Chat {
 	private final static ArrayListString channelList = new ArrayListString();
 	private final static HashMap<String, String> playerChannel = new HashMap<String, String>();
 	private final static HashMap<String, ArrayListString> playerHidden = new HashMap<String, ArrayListString>();
-	protected static mmo mmo;
+	protected static MMO mmo;
 
 	public static void addChannel(String name) {
 		if (!channelList.contains(name)) {
@@ -49,8 +50,8 @@ public class Chat {
 			return false;
 		}
 		boolean me = false;
-		if (mmo.firstWord(message).equalsIgnoreCase("/me")) {
-			message = mmo.removeFirstWord(message);
+		if (MMO.firstWord(message).equalsIgnoreCase("/me")) {
+			message = MMO.removeFirstWord(message);
 			me = true;
 		}
 		if (message.isEmpty()) {
@@ -69,8 +70,8 @@ public class Chat {
 		for (String filter : Arrays.asList(mmo.cfg.getString("channel." + channel + ".filters", "Server").split(","))) {
 			filters.add(filter);
 		}
-		mmoChatEventEvent event = new mmoChatEventEvent(from, filters, format, message);
-		mmoChat.pm.callEvent(event);
+		MMOChatEventEvent event = new MMOChatEventEvent(from, filters, format, message);
+		MMOChat.pm.callEvent(event);
 		Set<Player> recipients = event.getRecipients();
 		if (recipients.isEmpty()) {
 			mmo.sendMessage(from, "You seem to be talking to yourself...");
@@ -84,8 +85,8 @@ public class Chat {
 					String fmt = event.getFormat(to);
 					mmo.sendMessage(false, to, fmt,
 							  channel,
-							  mmo.getColor(to, from) + from.getName() + ChatColor.WHITE,
-							  mmo.getColor(from, to) + to.getName() + ChatColor.WHITE,
+							  MMO.getColor(to, from) + from.getName() + ChatColor.WHITE,
+							  MMO.getColor(from, to) + to.getName() + ChatColor.WHITE,
 							  msg);
 				}
 			}
@@ -170,8 +171,10 @@ public class Chat {
 		return channelList.get(channel);
 	}
 
-	private static class mmoChatEventEvent extends Event implements mmoChatEvent {
+	private static class MMOChatEventEvent extends Event implements MMOChatEvent {
 
+		private static final long serialVersionUID = -6501777115289445148L;
+		
 		private final ArrayListString filters;
 		private final HashMap<Player, String> messages = new HashMap<Player, String>();
 		private final HashMap<Player, String> formats = new HashMap<Player, String>();
@@ -181,7 +184,7 @@ public class Chat {
 		private String format;
 		private boolean cancel = false;
 
-		public mmoChatEventEvent(final Player player, final ArrayListString filters, final String format, final String message) {
+		public MMOChatEventEvent(final Player player, final ArrayListString filters, final String format, final String message) {
 			super("mmoChatEvent");
 			this.recipients = new HashSet<Player>(Arrays.asList(player.getServer().getOnlinePlayers()));
 			this.player = player;
