@@ -1,5 +1,5 @@
 name: mmoChat
-main: mmo.Chat.mmoChat
+main: mmo.Chat.MMOChat
 version: 0.3
 website: http://forums.bukkit.org/threads/
 author: Rycochet <rycochet@rycochet.com>
