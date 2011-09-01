@@ -18,8 +18,10 @@ package mmo.Chat;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import mmo.Core.mmo;
 import mmo.Core.mmoChatEvent;
 import mmo.Core.mmoListener;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 public class Channels extends mmoListener {
@@ -79,7 +81,7 @@ public class Channels extends mmoListener {
 				recipients.add(from);
 				recipients.add(to);
 				event.setFormat(to, event.getFormat().replaceAll("%2\\$s", "%2\\$s&f tells you"));
-				event.setFormat(from, event.getFormat().replaceAll("%2\\$s", "You tell %3\\$s&f"));
+				event.setFormat(from, event.getFormat().replaceAll("%2\\$s", "You tell " + mmo.getColor(from, to) + to.getName() + ChatColor.WHITE));
 			} else {
 				tells.remove(from.getName());
 			}
