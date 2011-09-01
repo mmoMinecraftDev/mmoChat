@@ -61,12 +61,12 @@
         <dependency>
             <groupId>mmo.Core.mmoCore</groupId>
             <artifactId>mmoCore</artifactId>
-            <version>0.8</version>
+            <version>dev</version>
         </dependency>
     </dependencies>
     <artifactId>mmoChat</artifactId>
     <name>mmoChat</name>
-    <version>1.0</version>
+    <version>dev</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>

@@ -30,14 +30,14 @@ import org.bukkit.event.player.PlayerListener;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 
-public class mmoChat extends mmoPlugin {
+public class MMOChat extends MMOPlugin {
 
 	protected static Server server;
 	protected static PluginManager pm;
 	protected static PluginDescriptionFile description;
-	protected static mmo mmo;
+	protected static MMO mmo;
 
-	public mmoChat() {
+	public MMOChat() {
 		classes.add(ChatDB.class);
 	}
 	
