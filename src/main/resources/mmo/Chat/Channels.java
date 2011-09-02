@@ -31,12 +31,12 @@ public class Channels extends MMOListener {
 
 	@Override
 	public void onMMOChat(MMOChatEvent event) {
+		Player from = event.getPlayer();
+		HashSet<Player> recipients = event.getRecipients();
 		if (event.hasFilter("Disabled")) {
-			event.getRecipients().clear();
+			recipients.clear();
 		}
 		if (event.hasFilter("Say")) {
-			Player from = event.getPlayer();
-			HashSet<Player> recipients = event.getRecipients();
 			for (Player to : new HashSet<Player>(recipients)) {
 				if (from.getWorld() != to.getWorld()
 						  || from.getLocation().distance(to.getLocation()) > 25) {
@@ -45,8 +45,6 @@ public class Channels extends MMOListener {
 			}
 		}
 		if (event.hasFilter("Yell")) {
-			Player from = event.getPlayer();
-			HashSet<Player> recipients = event.getRecipients();
 			for (Player to : new HashSet<Player>(recipients)) {
 				if (from.getWorld() != to.getWorld()
 						  || from.getLocation().distance(to.getLocation()) > 300) {
@@ -55,8 +53,6 @@ public class Channels extends MMOListener {
 			}
 		}
 		if (event.hasFilter("World")) {
-			Player from = event.getPlayer();
-			HashSet<Player> recipients = event.getRecipients();
 			for (Player to : new HashSet<Player>(recipients)) {
 				if (from.getWorld() != to.getWorld()) {
 					recipients.remove(to);
@@ -68,8 +64,6 @@ public class Channels extends MMOListener {
 		}
 		boolean isTell = event.hasFilter("Tell");
 		if (isTell || event.hasFilter("Reply")) {
-			HashSet<Player> recipients = new HashSet<Player>();
-			Player from = event.getPlayer();
 			Player to = MMO.server.getPlayer(
 					  isTell
 					  ? MMO.firstWord(event.getMessage())
@@ -77,16 +71,17 @@ public class Channels extends MMOListener {
 			if (isTell) {
 				event.setMessage(MMO.removeFirstWord(event.getMessage()));
 			}
+			HashSet<Player> keep = new HashSet<Player>();
 			if (to != null) {
 				tells.put(to.getName(), from.getName());
-				recipients.add(from);
-				recipients.add(to);
+				keep.add(from);
+				keep.add(to);
 				event.setFormat(to, event.getFormat().replaceAll("%2\\$s", "%2\\$s&f tells you"));
 				event.setFormat(from, event.getFormat().replaceAll("%2\\$s", "You tell " + MMO.getColor(from, to) + to.getName() + ChatColor.WHITE));
 			} else {
 				tells.remove(from.getName());
 			}
-			event.getRecipients().retainAll(recipients);
+			recipients.retainAll(keep);
 		}
 	}
 }
