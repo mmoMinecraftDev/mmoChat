@@ -67,8 +67,8 @@
 	<artifactId>mmoChat</artifactId>
 	<groupId>mmo.Chat.MMOChat</groupId>
 	<url>http://forums.bukkit.org/threads/31055/</url>
-	<version>dev</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
+	<version>dev</version>
 </project>
