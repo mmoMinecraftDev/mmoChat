@@ -1,8 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>mmo.Chat.MMOChat</groupId>
-	<url>http://forums.bukkit.org/threads/31055/</url>
 	<repositories>
 		<repository>
 			<id>bukkit-repo</id>
@@ -65,8 +63,10 @@
 			<version>dev</version>
 		</dependency>
 	</dependencies>
-	<artifactId>MMOChat</artifactId>
-	<name>MMOChat</name>
+	<name>mmoChat</name>
+	<artifactId>mmoChat</artifactId>
+	<groupId>mmo.Chat.MMOChat</groupId>
+	<url>http://forums.bukkit.org/threads/31055/</url>
 	<version>dev</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
