@@ -22,7 +22,7 @@ import java.util.HashSet;
 import java.util.Set;
 import mmo.Core.ArrayListString;
 import mmo.Core.MMO;
-import mmo.Core.MMOChatEvent;
+import mmo.Core.events.MMOChatEvent;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
