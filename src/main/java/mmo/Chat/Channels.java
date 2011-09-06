@@ -20,8 +20,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import mmo.Core.MMO;
-import mmo.Core.MMOChatEvent;
+import mmo.Core.events.MMOChatEvent;
 import mmo.Core.MMOListener;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
@@ -64,7 +65,7 @@ public class Channels extends MMOListener {
 		}
 		boolean isTell = event.hasFilter("Tell");
 		if (isTell || event.hasFilter("Reply")) {
-			Player to = MMO.server.getPlayer(
+			Player to = Bukkit.getServer().getPlayer(
 					  isTell
 					  ? MMO.firstWord(event.getMessage())
 					  : tells.get(from.getName()));

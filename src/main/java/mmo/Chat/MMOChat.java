@@ -16,10 +16,11 @@
  */
 package mmo.Chat;
 
+import java.util.ArrayList;
+import java.util.List;
 import mmo.Core.MMO;
 import mmo.Core.MMOPlugin;
 
-import org.bukkit.Server;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -28,71 +29,14 @@ import org.bukkit.event.Event.Type;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerListener;
-import org.bukkit.plugin.PluginDescriptionFile;
-import org.bukkit.plugin.PluginManager;
+import org.bukkit.util.config.Configuration;
 
 public class MMOChat extends MMOPlugin {
 
-	protected static Server server;
-	protected static PluginManager pm;
-	protected static PluginDescriptionFile description;
-	protected static MMO mmo;
-
-	public MMOChat() {
-		classes.add(ChatDB.class);
-	}
-	
 	@Override
 	public void onEnable() {
-		server = getServer();
-		pm = server.getPluginManager();
-		description = getDescription();
-
-		Chat.mmo = mmo = MMO.create(this);
+		super.onEnable();
 		MMO.mmoChat = true;
-		mmo.setPluginName("Chat");
-
-		mmo.log("loading " + description.getFullName());
-
-		mmo.cfg.getBoolean("auto_update", true);
-		mmo.cfg.getString("default_channel", "Chat");
-		if (mmo.cfg.getKeys("channel").isEmpty()) {
-			mmo.cfg.getBoolean("channel.Chat.enabled", true);
-			mmo.cfg.getBoolean("channel.Chat.command", true);
-			mmo.cfg.getBoolean("channel.Chat.log", true);
-			mmo.cfg.getString("channel.Chat.filters", "Server");
-
-			mmo.cfg.getBoolean("channel.Shout.enabled", true);
-			mmo.cfg.getBoolean("channel.Shout.command", true);
-			mmo.cfg.getBoolean("channel.Shout.log", true);
-			mmo.cfg.getString("channel.Shout.filters", "World");
-
-			mmo.cfg.getBoolean("channel.Yell.enabled", true);
-			mmo.cfg.getBoolean("channel.Yell.command", true);
-			mmo.cfg.getBoolean("channel.Yell.log", true);
-			mmo.cfg.getString("channel.Yell.filters", "Yell");
-
-			mmo.cfg.getBoolean("channel.Say.enabled", true);
-			mmo.cfg.getBoolean("channel.Say.command", true);
-			mmo.cfg.getBoolean("channel.Say.log", true);
-			mmo.cfg.getString("channel.Say.filters", "Say");
-
-			mmo.cfg.getBoolean("channel.Tell.enabled", true);
-			mmo.cfg.getBoolean("channel.Tell.command", true);
-			mmo.cfg.getBoolean("channel.Tell.log", false);
-			mmo.cfg.getString("channel.Tell.filters", "Tell");
-
-			mmo.cfg.getBoolean("channel.Reply.enabled", true);
-			mmo.cfg.getBoolean("channel.Reply.command", true);
-			mmo.cfg.getBoolean("channel.Reply.log", false);
-			mmo.cfg.getString("channel.Reply.filters", "Reply");
-
-			mmo.cfg.getBoolean("channel.Party.enabled", false);
-			mmo.cfg.getBoolean("channel.Party.command", false);
-			mmo.cfg.getBoolean("channel.Party.log", false);
-			mmo.cfg.getString("channel.Party.filters", "Party");
-		}
-		mmo.cfg.save();
 
 		getDatabase().find(ChatDB.class);//.findRowCount();
 
@@ -102,19 +46,62 @@ public class MMOChat extends MMOPlugin {
 
 		pm.registerEvent(Type.CUSTOM_EVENT, new Channels(), Priority.Normal, this);
 
-		for (String channel : mmo.cfg.getKeys("channel")) {
-			// Add all channels, even disabled ones - check is dynamic
-			Chat.addChannel(channel);
-		}
-
+		Chat.plugin = this;
+		Chat.cfg = cfg;
+		
 		Chat.load();
 	}
 
 	@Override
+	public void loadConfiguration(Configuration cfg) {
+		cfg.getString("default_channel", "Chat");
+		if (cfg.getKeys("channel").isEmpty()) {
+			cfg.getBoolean("channel.Chat.enabled", true);
+			cfg.getBoolean("channel.Chat.command", true);
+			cfg.getBoolean("channel.Chat.log", true);
+			cfg.getString("channel.Chat.filters", "Server");
+
+			cfg.getBoolean("channel.Shout.enabled", true);
+			cfg.getBoolean("channel.Shout.command", true);
+			cfg.getBoolean("channel.Shout.log", true);
+			cfg.getString("channel.Shout.filters", "World");
+
+			cfg.getBoolean("channel.Yell.enabled", true);
+			cfg.getBoolean("channel.Yell.command", true);
+			cfg.getBoolean("channel.Yell.log", true);
+			cfg.getString("channel.Yell.filters", "Yell");
+
+			cfg.getBoolean("channel.Say.enabled", true);
+			cfg.getBoolean("channel.Say.command", true);
+			cfg.getBoolean("channel.Say.log", true);
+			cfg.getString("channel.Say.filters", "Say");
+
+			cfg.getBoolean("channel.Tell.enabled", true);
+			cfg.getBoolean("channel.Tell.command", true);
+			cfg.getBoolean("channel.Tell.log", false);
+			cfg.getString("channel.Tell.filters", "Tell");
+
+			cfg.getBoolean("channel.Reply.enabled", true);
+			cfg.getBoolean("channel.Reply.command", true);
+			cfg.getBoolean("channel.Reply.log", false);
+			cfg.getString("channel.Reply.filters", "Reply");
+
+			cfg.getBoolean("channel.Party.enabled", false);
+			cfg.getBoolean("channel.Party.command", false);
+			cfg.getBoolean("channel.Party.log", false);
+			cfg.getString("channel.Party.filters", "Party");
+		}
+		for (String channel : cfg.getKeys("channel")) {
+			// Add all channels, even disabled ones - check is dynamic
+			Chat.addChannel(channel);
+		}
+	}
+
+	@Override
 	public void onDisable() {
-		mmo.log("Disabled " + description.getFullName());
-		mmo.autoUpdate();
+//		mmo.autoUpdate();
 		MMO.mmoChat = false;
+		super.onDisable();
 	}
 
 	@Override
@@ -136,15 +123,22 @@ public class MMOChat extends MMOPlugin {
 					}
 				} else {
 					if (Chat.setChannel(player, channel)) {
-						mmo.sendMessage(player, "Channel changed to %s", Chat.getChannel(player));
+						sendMessage(player, "Channel changed to %s", Chat.getChannel(player));
 					} else {
-						mmo.sendMessage(player, "Unknown channel");
+						sendMessage(player, "Unknown channel");
 					}
 					return true;
 				}
 			}
 		}
 		return false;
+	}
+
+	@Override
+	public List<Class<?>> getDatabaseClasses() {
+		List<Class<?>> list = new ArrayList<Class<?>>();
+		list.add(ChatDB.class);
+		return list;
 	}
 
 	public class mmoPlayerListener extends PlayerListener {
@@ -166,7 +160,7 @@ public class MMOChat extends MMOPlugin {
 						  && Chat.doChat(null, event.getPlayer(), message)) {
 					event.setCancelled(true);
 				} else if ((channel = Chat.findChannel(channel)) != null
-						  && mmo.cfg.getBoolean("channel." + channel + ".command", true)
+						  && cfg.getBoolean("channel." + channel + ".command", true)
 						  && Chat.doChat(channel, event.getPlayer(), MMO.removeFirstWord(message))) {
 					event.setCancelled(true);
 				}
