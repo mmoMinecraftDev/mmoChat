@@ -100,7 +100,6 @@ public class MMOChat extends MMOPlugin {
 
 	@Override
 	public void onDisable() {
-//		mmo.autoUpdate();
 		MMO.mmoChat = false;
 		super.onDisable();
 	}
