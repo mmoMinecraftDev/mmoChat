@@ -22,8 +22,8 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-@Entity()
-@Table(name = "mmo_Party")
+@Entity
+@Table(name = "mmo_Chat")
 public class ChatDB {
 
 	@Id
@@ -32,10 +32,16 @@ public class ChatDB {
 	private String player;
 
 	@NotNull
-	private String channel;
+	private String channel = "";
 
 	@NotNull
-	private String channelList;
+	private String channelList = "";
+
+	public ChatDB() {}
+
+	public ChatDB(String player) {
+		this.player = player;
+	}
 
 	public String getPlayer() {
 		return player;

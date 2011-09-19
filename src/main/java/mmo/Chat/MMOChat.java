@@ -17,6 +17,7 @@
 package mmo.Chat;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
 import mmo.Core.MMO;
 import mmo.Core.MMOPlugin;
@@ -34,11 +35,15 @@ import org.bukkit.util.config.Configuration;
 public class MMOChat extends MMOPlugin {
 
 	@Override
+	public BitSet mmoSupport(BitSet support) {
+		support.set(MMO_DATABASE);
+		return support;
+	}
+
+	@Override
 	public void onEnable() {
 		super.onEnable();
 		MMO.mmoChat = true;
-
-		getDatabase().find(ChatDB.class);//.findRowCount();
 
 		mmoPlayerListener mpl = new mmoPlayerListener();
 		pm.registerEvent(Type.PLAYER_CHAT, mpl, Priority.Normal, this);
