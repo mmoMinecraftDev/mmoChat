@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<modelVersion>4.0.0</modelVersion>
 
 	<!-- Project information -->
-	<groupId>mmo.Chat.MMOChat</groupId>
+	<groupId>mmo.Chat</groupId>
 	<artifactId>mmoChat</artifactId>
 	<name>mmoChat</name>
 	<version>dev</version>
@@ -96,10 +96,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>mmo.Core.MMOCore</groupId>
+			<groupId>mmo.Core</groupId>
 			<artifactId>mmoCore</artifactId>
 			<version>dev</version>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>mmo.ChatAPI</groupId>
+			<artifactId>mmoChatAPI</artifactId>
+			<version>dev</version>
+			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 
@@ -121,6 +127,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>2.3.2</version>
+			</plugin>
+			<!-- JAR dependency addition plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>1.4</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<artifactSet>
+								<includes>
+									<include>mmo.ChatAPI</include>
+								</includes>
+							</artifactSet>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

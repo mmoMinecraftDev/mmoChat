@@ -16,11 +16,10 @@
  */
 package mmo.Chat;
 
+import mmo.ChatAPI.MMOChatEvent;
 import java.util.HashMap;
 import java.util.HashSet;
-
 import mmo.Core.MMO;
-import mmo.Core.events.MMOChatEvent;
 import mmo.Core.MMOListener;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;

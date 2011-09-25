@@ -16,12 +16,13 @@
  */
 package mmo.Chat;
 
+import mmo.ChatAPI.Chat;
+import mmo.ChatAPI.ChatDB;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 import mmo.Core.MMO;
 import mmo.Core.MMOPlugin;
-
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -43,7 +44,6 @@ public class MMOChat extends MMOPlugin {
 	@Override
 	public void onEnable() {
 		super.onEnable();
-		MMO.mmoChat = true;
 
 		mmoPlayerListener mpl = new mmoPlayerListener();
 		pm.registerEvent(Type.PLAYER_CHAT, mpl, Priority.Normal, this);
@@ -101,12 +101,6 @@ public class MMOChat extends MMOPlugin {
 			// Add all channels, even disabled ones - check is dynamic
 			Chat.addChannel(channel);
 		}
-	}
-
-	@Override
-	public void onDisable() {
-		MMO.mmoChat = false;
-		super.onDisable();
 	}
 
 	@Override
