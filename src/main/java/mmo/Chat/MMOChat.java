@@ -16,8 +16,6 @@
  */
 package mmo.Chat;
 
-import mmo.ChatAPI.Chat;
-import mmo.ChatAPI.ChatDB;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;

@@ -20,7 +20,7 @@ import mmo.ChatAPI.MMOChatEvent;
 import java.util.HashMap;
 import java.util.HashSet;
 import mmo.Core.MMO;
-import mmo.Core.MMOListener;
+import mmo.CoreAPI.MMOListener;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
