@@ -17,10 +17,10 @@
 package mmo.Chat;
 
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.List;
 import mmo.Core.MMO;
 import mmo.Core.MMOPlugin;
+import mmo.Core.util.EnumBitSet;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -34,8 +34,8 @@ import org.bukkit.util.config.Configuration;
 public class MMOChat extends MMOPlugin {
 
 	@Override
-	public BitSet mmoSupport(BitSet support) {
-		support.set(MMO_DATABASE);
+	public EnumBitSet mmoSupport(EnumBitSet support) {
+		support.set(Support.MMO_DATABASE);
 		return support;
 	}
 
