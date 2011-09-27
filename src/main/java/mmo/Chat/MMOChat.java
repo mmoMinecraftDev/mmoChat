@@ -34,7 +34,7 @@ import org.bukkit.util.config.Configuration;
 
 public class MMOChat extends MMOPlugin {
 
-	static ChatAPI chat;
+	static final ChatAPI chat = ChatAPI.instance;
 	
 	@Override
 	public EnumBitSet mmoSupport(EnumBitSet support) {
@@ -47,7 +47,7 @@ public class MMOChat extends MMOPlugin {
 		super.onEnable();
 		ChatAPI.plugin = this;
 		ChatAPI.cfg = cfg;
-		MMOMinecraft.setAPI(this, chat = ChatAPI.instance);
+		MMOMinecraft.addAPI(chat);
 
 		mmoPlayerListener mpl = new mmoPlayerListener();
 		pm.registerEvent(Type.PLAYER_CHAT, mpl, Priority.Normal, this);
