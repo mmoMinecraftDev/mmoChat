@@ -19,6 +19,7 @@ package mmo.Chat;
 import java.util.ArrayList;
 import java.util.List;
 import mmo.Core.MMO;
+import mmo.Core.MMOMinecraft;
 import mmo.Core.MMOPlugin;
 import mmo.Core.util.EnumBitSet;
 import org.bukkit.command.Command;
@@ -33,6 +34,8 @@ import org.bukkit.util.config.Configuration;
 
 public class MMOChat extends MMOPlugin {
 
+	static ChatAPI chat;
+	
 	@Override
 	public EnumBitSet mmoSupport(EnumBitSet support) {
 		support.set(Support.MMO_DATABASE);
@@ -42,6 +45,9 @@ public class MMOChat extends MMOPlugin {
 	@Override
 	public void onEnable() {
 		super.onEnable();
+		ChatAPI.plugin = this;
+		ChatAPI.cfg = cfg;
+		MMOMinecraft.setAPI(this, chat = ChatAPI.instance);
 
 		mmoPlayerListener mpl = new mmoPlayerListener();
 		pm.registerEvent(Type.PLAYER_CHAT, mpl, Priority.Normal, this);
@@ -49,10 +55,7 @@ public class MMOChat extends MMOPlugin {
 
 		pm.registerEvent(Type.CUSTOM_EVENT, new Channels(), Priority.Normal, this);
 
-		Chat.plugin = this;
-		Chat.cfg = cfg;
-		
-		Chat.load();
+		chat.load();
 	}
 
 	@Override
@@ -97,7 +100,7 @@ public class MMOChat extends MMOPlugin {
 		}
 		for (String channel : cfg.getKeys("channel")) {
 			// Add all channels, even disabled ones - check is dynamic
-			Chat.addChannel(channel);
+			chat.addChannel(channel);
 		}
 	}
 
@@ -109,18 +112,18 @@ public class MMOChat extends MMOPlugin {
 		Player player = (Player) sender;
 		if (command.getName().equalsIgnoreCase("channel")) {
 			String channel;
-			if (args.length > 0 && (channel = Chat.findChannel(args[0])) != null) {
+			if (args.length > 0 && (channel = chat.findChannel(args[0])) != null) {
 				if (args.length > 1) {
 					if (args[1].equalsIgnoreCase("hide")) {
-						Chat.hideChannel(player, channel);
+						chat.hideChannel(player, channel);
 						return true;
 					} else if (args[1].equalsIgnoreCase("show")) {
-						Chat.hideChannel(player, channel);
+						chat.hideChannel(player, channel);
 						return true;
 					}
 				} else {
-					if (Chat.setChannel(player, channel)) {
-						sendMessage(player, "Channel changed to %s", Chat.getChannel(player));
+					if (chat.setChannel(player, channel)) {
+						sendMessage(player, "Channel changed to %s", chat.getChannel(player));
 					} else {
 						sendMessage(player, "Unknown channel");
 					}
@@ -142,7 +145,7 @@ public class MMOChat extends MMOPlugin {
 
 		@Override
 		public void onPlayerChat(PlayerChatEvent event) {
-			if (Chat.doChat(null, event.getPlayer(), event.getMessage())) {
+			if (chat.doChat(null, event.getPlayer(), event.getMessage())) {
 				event.setCancelled(true);
 			}
 		}
@@ -154,11 +157,11 @@ public class MMOChat extends MMOPlugin {
 			if (channel != null && !channel.isEmpty()) {
 				channel = channel.substring(1);
 				if ("me".equalsIgnoreCase(channel)
-						  && Chat.doChat(null, event.getPlayer(), message)) {
+						  && chat.doChat(null, event.getPlayer(), message)) {
 					event.setCancelled(true);
-				} else if ((channel = Chat.findChannel(channel)) != null
+				} else if ((channel = chat.findChannel(channel)) != null
 						  && cfg.getBoolean("channel." + channel + ".command", true)
-						  && Chat.doChat(channel, event.getPlayer(), MMO.removeFirstWord(message))) {
+						  && chat.doChat(channel, event.getPlayer(), MMO.removeFirstWord(message))) {
 					event.setCancelled(true);
 				}
 			}

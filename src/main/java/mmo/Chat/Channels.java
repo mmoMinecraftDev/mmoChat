@@ -16,11 +16,12 @@
  */
 package mmo.Chat;
 
-import mmo.ChatAPI.MMOChatEvent;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
+import mmo.Core.ChatAPI.MMOChatEvent;
 import mmo.Core.MMO;
-import mmo.CoreAPI.MMOListener;
+import mmo.Core.MMOListener;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -32,7 +33,7 @@ public class Channels extends MMOListener {
 	@Override
 	public void onMMOChat(MMOChatEvent event) {
 		Player from = event.getPlayer();
-		HashSet<Player> recipients = event.getRecipients();
+		Set<Player> recipients = event.getRecipients();
 		if (event.hasFilter("Disabled")) {
 			recipients.clear();
 		}

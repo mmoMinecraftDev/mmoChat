@@ -19,7 +19,7 @@ package mmo.Chat;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Set;
-import mmo.ChatAPI.MMOChatEvent;
+import mmo.Core.ChatAPI.Chat;
 import mmo.Core.util.ArrayListString;
 import mmo.Core.MMO;
 import mmo.Core.MMOPlugin;
@@ -27,22 +27,29 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.util.config.Configuration;
 
-public class Chat {
+public class ChatAPI implements Chat {
 
+	private ChatAPI() { // Prevent instantiation
+	}
+	/**
+	 * Singleton instance
+	 */
+	public final static ChatAPI instance = new ChatAPI();
+	// ...and now the class...
 	private final static ArrayListString channelList = new ArrayListString();
 	private final static HashMap<String, String> playerChannel = new HashMap<String, String>();
 	private final static HashMap<String, ArrayListString> playerHidden = new HashMap<String, ArrayListString>();
-
 	public static MMOPlugin plugin;
 	public static Configuration cfg;
 
-	public static void addChannel(String name) {
+	public void addChannel(String name) {
 		if (!channelList.contains(name)) {
 			channelList.add(name);
 		}
 	}
 
-	public static boolean doChat(String channel, Player from, String message) {
+	@Override
+	public boolean doChat(String channel, Player from, String message) {
 		if (channel == null) {
 			channel = getChannel(from);
 		}
@@ -71,7 +78,7 @@ public class Chat {
 		for (String filter : Arrays.asList(cfg.getString("channel." + channel + ".filters", "Server").split(","))) {
 			filters.add(filter);
 		}
-		MMOChatEvent event = new MMOChatEvent(from, filters, format, message);
+		MMOChatEventAPI event = new MMOChatEventAPI(from, filters, format, message);
 		plugin.getServer().getPluginManager().callEvent(event);
 		Set<Player> recipients = event.getRecipients();
 		if (recipients.isEmpty()) {
@@ -85,17 +92,18 @@ public class Chat {
 				if (msg != null && !msg.isEmpty()) {
 					String fmt = event.getFormat(to);
 					plugin.sendMessage(false, to, fmt,
-							  channel,
-							  MMO.getColor(to, from) + from.getName() + ChatColor.WHITE,
-							  MMO.getColor(from, to) + to.getName() + ChatColor.WHITE,
-							  msg);
+							channel,
+							MMO.getColor(to, from) + from.getName() + ChatColor.WHITE,
+							MMO.getColor(from, to) + to.getName() + ChatColor.WHITE,
+							msg);
 				}
 			}
 		}
 		return true;
 	}
 
-	public static boolean hideChannel(Player player, String channel) {
+	@Override
+	public boolean hideChannel(Player player, String channel) {
 		if (channelList.contains(channel)) {
 			ArrayListString list = playerHidden.get(player.getName());
 			if (list == null) {
@@ -109,7 +117,8 @@ public class Chat {
 		return false;
 	}
 
-	public static boolean showChannel(Player player, String channel) {
+	@Override
+	public boolean showChannel(Player player, String channel) {
 		if (channelList.contains(channel)) {
 			ArrayListString list = playerHidden.get(player.getName());
 			if (list == null) {
@@ -123,30 +132,24 @@ public class Chat {
 		return false;
 	}
 
-	public static boolean setChannel(Player player, String channel) {
-		return setChannel(player.getName(), channel);
-	}
-
-	public static boolean setChannel(String name, String channel) {
+	@Override
+	public boolean setChannel(Player player, String channel) {
+		String name = player.getName();
 		if (channelList.contains(channel)) {
 			playerChannel.put(name, channel);
 			ChatDB row = plugin.getDatabase().find(ChatDB.class).where().ieq("player", name).findUnique();
-//			if (party.isParty() || !party.invites.isEmpty()) {
-				if (row == null) {
-					row = new ChatDB();
-					row.setPlayer(name);
-				}
-				row.setChannel(channel);
-				plugin.getDatabase().save(row);
-//			} else if (row != null) {
-//				mmo.plugin.getDatabase().delete(row);
-//			}
+			if (row == null) {
+				row = new ChatDB();
+				row.setPlayer(name);
+			}
+			row.setChannel(channel);
+			plugin.getDatabase().save(row);
 			return true;
 		}
 		return false;
 	}
 
-	public static void load() {
+	public void load() {
 		try {
 			for (ChatDB row : plugin.getDatabase().find(ChatDB.class).setAutofetch(true).findList()) {
 				playerChannel.put(row.getPlayer(), row.getChannel());
@@ -155,14 +158,24 @@ public class Chat {
 		}
 	}
 
-	public static String findChannel(String channel) {
-		if (channelList.contains(channel)) {
+	@Override
+	public String findChannel(String channel) {
+		if (isChannel(channel)) {
 			return channelList.get(channel);
 		}
 		return null;
 	}
 
-	public static String getChannel(Player player) {
+	@Override
+	public boolean isChannel(String channel) {
+		if (channelList.contains(channel)) {
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public String getChannel(Player player) {
 		String channel = playerChannel.get(player.getName());
 		channel = channel == null ? cfg.getString("default_channel", "Chat") : channel;
 		if (!channelList.contains(channel)) {
