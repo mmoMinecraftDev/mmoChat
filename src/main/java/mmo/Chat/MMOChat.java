@@ -39,6 +39,7 @@ public class MMOChat extends MMOPlugin {
 	@Override
 	public EnumBitSet mmoSupport(EnumBitSet support) {
 		support.set(Support.MMO_DATABASE);
+		support.set(Support.MMO_PLAYER);
 		return support;
 	}
 
@@ -54,8 +55,6 @@ public class MMOChat extends MMOPlugin {
 		pm.registerEvent(Type.PLAYER_COMMAND_PREPROCESS, mpl, Priority.Normal, this);
 
 		pm.registerEvent(Type.CUSTOM_EVENT, new Channels(), Priority.Normal, this);
-
-		chat.load();
 	}
 
 	@Override
@@ -139,6 +138,16 @@ public class MMOChat extends MMOPlugin {
 		List<Class<?>> list = new ArrayList<Class<?>>();
 		list.add(ChatDB.class);
 		return list;
+	}
+
+	@Override
+	public void onPlayerJoin(Player player) {
+		chat.load(player.getName());
+	}
+
+	@Override
+	public void onPlayerQuit(Player player) {
+		chat.unload(player.getName());
 	}
 
 	public class mmoPlayerListener extends PlayerListener {

@@ -149,15 +149,6 @@ public class ChatAPI implements Chat {
 		return false;
 	}
 
-	public void load() {
-		try {
-			for (ChatDB row : plugin.getDatabase().find(ChatDB.class).setAutofetch(true).findList()) {
-				playerChannel.put(row.getPlayer(), row.getChannel());
-			}
-		} catch (Exception e) {
-		}
-	}
-
 	@Override
 	public String findChannel(String channel) {
 		if (isChannel(channel)) {
@@ -183,5 +174,24 @@ public class ChatAPI implements Chat {
 			return channelList.get(0);
 		}
 		return channelList.get(channel);
+	}
+
+	/**
+	 * Load the default channel for a player
+	 * @param player
+	 */
+	public void load(String player) {
+		ChatDB row = plugin.getDatabase().find(ChatDB.class).where().eq("player", player).findUnique();
+		if (row != null) {
+			playerChannel.put(row.getPlayer(), row.getChannel());
+		}
+	}
+
+	/**
+	 * Free a player's default channel
+	 * @param player
+	 */
+	public void unload(String player) {
+		playerChannel.remove(player);
 	}
 }
