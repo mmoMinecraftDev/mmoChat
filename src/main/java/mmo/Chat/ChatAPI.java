@@ -181,7 +181,7 @@ public class ChatAPI implements Chat {
 	 * @param player
 	 */
 	public void load(String player) {
-		ChatDB row = plugin.getDatabase().find(ChatDB.class).where().eq("player", player).findUnique();
+		ChatDB row = plugin.getDatabase().find(ChatDB.class).setId(player).findUnique();
 		if (row != null) {
 			playerChannel.put(row.getPlayer(), row.getChannel());
 		}

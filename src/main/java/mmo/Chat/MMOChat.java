@@ -17,6 +17,7 @@
 package mmo.Chat;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import mmo.Core.MMO;
 import mmo.Core.MMOMinecraft;
@@ -31,11 +32,26 @@ import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.util.config.Configuration;
+import org.getspout.spoutapi.event.screen.ScreenCloseEvent;
+import org.getspout.spoutapi.event.screen.ScreenListener;
+import org.getspout.spoutapi.event.screen.ScreenOpenEvent;
+import org.getspout.spoutapi.gui.Color;
+import org.getspout.spoutapi.gui.Container;
+import org.getspout.spoutapi.gui.ContainerType;
+import org.getspout.spoutapi.gui.GenericContainer;
+import org.getspout.spoutapi.gui.GenericGradient;
+import org.getspout.spoutapi.gui.GenericLabel;
+import org.getspout.spoutapi.gui.RenderPriority;
+import org.getspout.spoutapi.gui.Screen;
+import org.getspout.spoutapi.gui.ScreenType;
+import org.getspout.spoutapi.gui.Widget;
+import org.getspout.spoutapi.gui.WidgetAnchor;
+import org.getspout.spoutapi.player.SpoutPlayer;
 
 public class MMOChat extends MMOPlugin {
 
 	static final ChatAPI chat = ChatAPI.instance;
-	
+
 	@Override
 	public EnumBitSet mmoSupport(EnumBitSet support) {
 		support.set(Support.MMO_DATABASE);
@@ -55,6 +71,8 @@ public class MMOChat extends MMOPlugin {
 		pm.registerEvent(Type.PLAYER_COMMAND_PREPROCESS, mpl, Priority.Normal, this);
 
 		pm.registerEvent(Type.CUSTOM_EVENT, new Channels(), Priority.Normal, this);
+
+		pm.registerEvent(Type.CUSTOM_EVENT, new mmoScreenListener(), Priority.Monitor, this);
 	}
 
 	@Override
@@ -166,12 +184,40 @@ public class MMOChat extends MMOPlugin {
 			if (channel != null && !channel.isEmpty()) {
 				channel = channel.substring(1);
 				if ("me".equalsIgnoreCase(channel)
-						  && chat.doChat(null, event.getPlayer(), message)) {
+						&& chat.doChat(null, event.getPlayer(), message)) {
 					event.setCancelled(true);
 				} else if ((channel = chat.findChannel(channel)) != null
-						  && cfg.getBoolean("channel." + channel + ".command", true)
-						  && chat.doChat(channel, event.getPlayer(), MMO.removeFirstWord(message))) {
+						&& cfg.getBoolean("channel." + channel + ".command", true)
+						&& chat.doChat(channel, event.getPlayer(), MMO.removeFirstWord(message))) {
 					event.setCancelled(true);
+				}
+			}
+		}
+	}
+	protected static HashMap<Player, Widget> chatbar = new HashMap<Player, Widget>();
+
+	public class mmoScreenListener extends ScreenListener {
+
+		@Override
+		public void onScreenOpen(ScreenOpenEvent event) {
+			if (!event.isCancelled() && event.getScreenType() == ScreenType.CHAT_SCREEN) {
+				SpoutPlayer player = event.getPlayer();
+				Color color = new Color(0f, 0f, 0f, 0.5f);
+				Widget label, bar = new GenericContainer(
+						label = new GenericLabel(chat.getChannel(player)).setResize(true).setFixed(true).setMargin(2, 2, 0, 2).setPriority(RenderPriority.Normal),
+						new GenericGradient().setBottomColor(color).setTopColor(color).setPriority(RenderPriority.Highest)
+					).setLayout(ContainerType.OVERLAY).setAnchor(WidgetAnchor.BOTTOM_LEFT).setY(-26).setX(4).setHeight(12).setWidth(label.getWidth() + 4);
+				chatbar.put(player, bar);
+				player.getCurrentScreen().attachWidget(plugin, bar);
+			}
+		}
+
+		@Override
+		public void onScreenClose(ScreenCloseEvent event) {
+			if (!event.isCancelled() && event.getScreenType() == ScreenType.CHAT_SCREEN) {
+				Widget bar = chatbar.remove(event.getPlayer());
+				if (bar != null) {
+					bar.getScreen().removeWidget(bar);
 				}
 			}
 		}
