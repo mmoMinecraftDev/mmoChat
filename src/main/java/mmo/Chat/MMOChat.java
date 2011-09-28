@@ -23,6 +23,7 @@ import mmo.Core.MMO;
 import mmo.Core.MMOMinecraft;
 import mmo.Core.MMOPlugin;
 import mmo.Core.util.EnumBitSet;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -49,6 +50,7 @@ import org.getspout.spoutapi.player.SpoutPlayer;
 public class MMOChat extends MMOPlugin {
 
 	static final ChatAPI chat = ChatAPI.instance;
+	static final HashMap<Player, Widget> chatbar = new HashMap<Player, Widget>();
 
 	@Override
 	public EnumBitSet mmoSupport(EnumBitSet support) {
@@ -192,21 +194,26 @@ public class MMOChat extends MMOPlugin {
 			}
 		}
 	}
-	protected static HashMap<Player, Widget> chatbar = new HashMap<Player, Widget>();
 
 	public class mmoScreenListener extends ScreenListener {
 
 		@Override
 		public void onScreenOpen(ScreenOpenEvent event) {
 			if (!event.isCancelled() && event.getScreenType() == ScreenType.CHAT_SCREEN) {
+				Color black = new Color(0f, 0f, 0f, 0.5f), white = new Color(1f, 1f, 1f, 0.5f);
 				SpoutPlayer player = event.getPlayer();
-				Color color = new Color(0f, 0f, 0f, 0.5f);
 				Widget label, bar = new GenericContainer(
-						label = new GenericLabel(chat.getChannel(player)).setResize(true).setFixed(true).setMargin(2, 2, 0, 2).setPriority(RenderPriority.Normal),
-						new GenericGradient().setBottomColor(color).setTopColor(color).setPriority(RenderPriority.Highest)
-					).setLayout(ContainerType.OVERLAY).setAnchor(WidgetAnchor.BOTTOM_LEFT).setY(-26).setX(4).setHeight(12).setWidth(label.getWidth() + 4);
+						label = new GenericLabel(ChatColor.GRAY + chat.getChannel(player)).setResize(true).setFixed(true).setMargin(3, 3, 0, 3),
+						new GenericGradient().setBottomColor(black).setTopColor(black).setPriority(RenderPriority.Highest),
+						new GenericGradient().setBottomColor(white).setTopColor(white).setMaxWidth(1).setPriority(RenderPriority.High),
+						new GenericGradient().setBottomColor(white).setTopColor(white).setMaxWidth(1).setMarginLeft(label.getWidth() + 5).setPriority(RenderPriority.High),
+						new GenericGradient().setBottomColor(white).setTopColor(white).setMaxHeight(1).setPriority(RenderPriority.High)
+					).setLayout(ContainerType.OVERLAY).setAnchor(WidgetAnchor.BOTTOM_LEFT).setY(-27).setX(4).setHeight(13).setWidth(label.getWidth() + 6).setVisible(false);
 				chatbar.put(player, bar);
-				player.getCurrentScreen().attachWidget(plugin, bar);
+				player.getMainScreen().attachWidget(plugin, bar);
+				if (bar != null) {
+					bar.setVisible(true).setDirty(true);
+				}
 			}
 		}
 
@@ -215,7 +222,7 @@ public class MMOChat extends MMOPlugin {
 			if (!event.isCancelled() && event.getScreenType() == ScreenType.CHAT_SCREEN) {
 				Widget bar = chatbar.remove(event.getPlayer());
 				if (bar != null) {
-					bar.getScreen().removeWidget(bar);
+					bar.setVisible(false).setDirty(true);
 				}
 			}
 		}

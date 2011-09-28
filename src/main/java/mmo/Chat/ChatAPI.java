@@ -36,11 +36,11 @@ public class ChatAPI implements Chat {
 	 */
 	public final static ChatAPI instance = new ChatAPI();
 	// ...and now the class...
-	private final static ArrayListString channelList = new ArrayListString();
-	private final static HashMap<String, String> playerChannel = new HashMap<String, String>();
-	private final static HashMap<String, ArrayListString> playerHidden = new HashMap<String, ArrayListString>();
-	public static MMOPlugin plugin;
-	public static Configuration cfg;
+	final static ArrayListString channelList = new ArrayListString();
+	final static HashMap<String, String> playerChannel = new HashMap<String, String>();
+	final static HashMap<String, ArrayListString> playerHidden = new HashMap<String, ArrayListString>();
+	static MMOPlugin plugin;
+	static Configuration cfg;
 
 	public void addChannel(String name) {
 		if (!channelList.contains(name)) {
@@ -49,12 +49,14 @@ public class ChatAPI implements Chat {
 	}
 
 	@Override
-	public boolean doChat(String channel, Player from, String message) {
-		if (channel == null) {
-			channel = getChannel(from);
+	public boolean doChat(String chan, Player from, String message) {
+		if (chan == null) {
+			chan = getChannel(from);
 		}
-		channel = channelList.get(channel);
-		if (!cfg.getBoolean("channel." + channel + ".enabled", true)) {
+		String channel = channelList.get(chan);
+		if (!cfg.getBoolean("channel." + channel + ".enabled", true) || !useChannel(from, channel)) {
+			// Report it as unknown if no permission or it's disabled
+			plugin.sendMessage(from, "Unknown channel: %s", chan);
 			return false;
 		}
 		boolean me = false;
@@ -89,7 +91,7 @@ public class ChatAPI implements Chat {
 			}
 			for (Player to : recipients) {
 				String msg = event.getMessage(to);
-				if (msg != null && !msg.isEmpty()) {
+				if (msg != null && !msg.isEmpty() && seeChannel(to, channel)) {
 					String fmt = event.getFormat(to);
 					plugin.sendMessage(false, to, fmt,
 							channel,
@@ -130,6 +132,36 @@ public class ChatAPI implements Chat {
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public boolean seeChannel(Player player, String channel) {
+		String[] perms = {
+			"mmo.chat." + channel + ".see",
+			"mmo.chat.*.see",
+			"mmo.chat." + channel,
+			"mmo.chat.*"};
+		for (String perm : perms) {
+			if (player.isPermissionSet(perm)) {
+				return player.hasPermission(perm);
+			}
+		}
+		return true;
+	}
+
+	@Override
+	public boolean useChannel(Player player, String channel) {
+		String[] perms = {
+			"mmo.chat." + channel + ".use",
+			"mmo.chat.*.use",
+			"mmo.chat." + channel,
+			"mmo.chat.*"};
+		for (String perm : perms) {
+			if (player.isPermissionSet(perm)) {
+				return player.hasPermission(perm);
+			}
+		}
+		return true;
 	}
 
 	@Override
