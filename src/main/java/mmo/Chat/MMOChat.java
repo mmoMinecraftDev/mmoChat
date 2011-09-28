@@ -149,6 +149,9 @@ public class MMOChat extends MMOPlugin {
 					}
 					return true;
 				}
+			} else {
+				sendMessage(player, "Currently speaking on %s", chat.getChannel(player));
+				return true;
 			}
 		}
 		return false;

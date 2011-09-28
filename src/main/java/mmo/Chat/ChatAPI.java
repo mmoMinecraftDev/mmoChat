@@ -146,6 +146,13 @@ public class ChatAPI implements Chat {
 
 	@Override
 	public boolean seeChannel(Player player, String channel) {
+		if (playerHidden.containsKey(player.getName())) {
+			for (String chan : playerHidden.get(player.getName())) {
+				if (channel.equalsIgnoreCase(chan)) {
+					return false;
+				}
+			}
+		}
 		String[] perms = {
 			"mmo.chat." + channel + ".see",
 			"mmo.chat.*.see",
