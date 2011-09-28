@@ -118,6 +118,9 @@ public class MMOChat extends MMOPlugin {
 		for (String channel : cfg.getKeys("channel")) {
 			// Add all channels, even disabled ones - check is dynamic
 			chat.addChannel(channel);
+			for (String alias : cfg.getStringList("channel." + channel + ".alias", new ArrayList<String>())) {
+				chat.addAlias(channel, alias);
+			}
 		}
 	}
 

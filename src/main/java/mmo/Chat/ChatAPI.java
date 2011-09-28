@@ -16,6 +16,7 @@
  */
 package mmo.Chat;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Set;
@@ -23,6 +24,7 @@ import mmo.Core.ChatAPI.Chat;
 import mmo.Core.util.ArrayListString;
 import mmo.Core.MMO;
 import mmo.Core.MMOPlugin;
+import mmo.Core.util.HashMapString;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.util.config.Configuration;
@@ -37,14 +39,22 @@ public class ChatAPI implements Chat {
 	public final static ChatAPI instance = new ChatAPI();
 	// ...and now the class...
 	final static ArrayListString channelList = new ArrayListString();
-	final static HashMap<String, String> playerChannel = new HashMap<String, String>();
-	final static HashMap<String, ArrayListString> playerHidden = new HashMap<String, ArrayListString>();
+	final static HashMapString<String> aliasList = new HashMapString<String>();
+	final static HashMapString<String> playerChannel = new HashMapString<String>();
+	final static HashMapString<ArrayListString> playerHidden = new HashMapString<ArrayListString>();
 	static MMOPlugin plugin;
 	static Configuration cfg;
 
 	public void addChannel(String name) {
 		if (!channelList.contains(name)) {
 			channelList.add(name);
+		}
+	}
+
+	public void addAlias(String channel, String alias) {
+		addChannel(channel);
+		if (!aliasList.containsKey(alias)) {
+			aliasList.put(alias, channel);
 		}
 	}
 
@@ -77,7 +87,7 @@ public class ChatAPI implements Chat {
 			format = me ? "[%1$s] * %2$s %4$s" : "[%1$s] %2$s: %4$s";
 		}
 		ArrayListString filters = new ArrayListString();
-		for (String filter : Arrays.asList(cfg.getString("channel." + channel + ".filters", "Server").split(","))) {
+		for (String filter : cfg.getStringList("channel." + channel + ".filters", new ArrayList<String>())) {
 			filters.add(filter);
 		}
 		MMOChatEventAPI event = new MMOChatEventAPI(from, filters, format, message);
@@ -183,8 +193,11 @@ public class ChatAPI implements Chat {
 
 	@Override
 	public String findChannel(String channel) {
-		if (isChannel(channel)) {
+		if (channelList.contains(channel)) {
 			return channelList.get(channel);
+		}
+		if (aliasList.containsKey(channel)) {
+			return aliasList.get(channel);
 		}
 		return null;
 	}
