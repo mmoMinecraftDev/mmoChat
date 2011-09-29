@@ -60,7 +60,7 @@ public class MMOChatEventAPI extends Event implements MMOChatEvent {
 
 	@Override
 	public String[] getArgs(String filter) {
-		return args.get(filter);
+		return args.containsKey(filter) ? args.get(filter) : new String[0];
 	}
 
 	@Override
