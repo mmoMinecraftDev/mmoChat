@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import mmo.Core.ChatAPI.MMOChatEvent;
 import org.bukkit.entity.Player;
@@ -35,14 +36,16 @@ public class MMOChatEventAPI extends Event implements MMOChatEvent {
 	private String message;
 	private String format;
 	private boolean cancel = false;
+	private Map<String,String[]> args = null;
 
-	public MMOChatEventAPI(final Player player, final List filters, final String format, final String message) {
+	public MMOChatEventAPI(final Player player, final List filters, final Map<String,String[]> args, final String format, final String message) {
 		super("mmoChatEvent");
 		this.recipients = new HashSet<Player>(Arrays.asList(player.getServer().getOnlinePlayers()));
 		this.player = player;
+		this.filters = filters;
+		this.args = args;
 		this.format = format;
 		this.message = message;
-		this.filters = filters;
 	}
 
 	@Override
@@ -53,6 +56,11 @@ public class MMOChatEventAPI extends Event implements MMOChatEvent {
 	@Override
 	public void setMessage(Player player, String message) {
 		messages.put(player, message);
+	}
+
+	@Override
+	public String[] getArgs(String filter) {
+		return args.get(filter);
 	}
 
 	@Override
@@ -103,7 +111,7 @@ public class MMOChatEventAPI extends Event implements MMOChatEvent {
 
 	@Override
 	public Set<Player> getRecipients() {
-		return messages.isEmpty() ? recipients : new HashSet<Player>(messages.keySet());
+		return recipients;
 	}
 
 	@Override

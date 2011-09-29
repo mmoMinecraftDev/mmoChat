@@ -87,10 +87,13 @@ public class ChatAPI implements Chat {
 			format = me ? "[%1$s] * %2$s %4$s" : "[%1$s] %2$s: %4$s";
 		}
 		ArrayListString filters = new ArrayListString();
+		HashMapString<String[]> args = new HashMapString<String[]>();
 		for (String filter : cfg.getStringList("channel." + channel + ".filters", new ArrayList<String>())) {
-			filters.add(filter);
+			String name = MMO.firstWord(filter);
+			filters.add(name);
+			args.put(name, MMO.smartSplit(MMO.removeFirstWord(filter)));
 		}
-		MMOChatEventAPI event = new MMOChatEventAPI(from, filters, format, message);
+		MMOChatEventAPI event = new MMOChatEventAPI(from, filters, args, format, message);
 		plugin.getServer().getPluginManager().callEvent(event);
 		Set<Player> recipients = event.getRecipients();
 		if (recipients.isEmpty()) {

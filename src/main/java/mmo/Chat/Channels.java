@@ -45,6 +45,19 @@ public class Channels extends MMOListener {
 				}
 			}
 		}
+		if (event.hasFilter("Range")) {
+			int range = 100;
+			String[] args = event.getArgs("Range");
+			if (args.length > 0) {
+				range = Integer.parseInt(args[0]);
+			}
+			for (Player to : new HashSet<Player>(recipients)) {
+				if (from.getWorld() != to.getWorld()
+						  || from.getLocation().distance(to.getLocation()) > range) {
+					recipients.remove(to);
+				}
+			}
+		}
 		if (event.hasFilter("Yell")) {
 			for (Player to : new HashSet<Player>(recipients)) {
 				if (from.getWorld() != to.getWorld()
