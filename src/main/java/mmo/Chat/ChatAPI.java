@@ -17,8 +17,6 @@
 package mmo.Chat;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Set;
 import mmo.Core.ChatAPI.Chat;
 import mmo.Core.util.ArrayListString;
@@ -223,9 +221,9 @@ public class ChatAPI implements Chat {
 	@Override
 	public String getChannel(Player player) {
 		String channel = playerChannel.get(player.getName());
-		channel = channel == null ? cfg.getString("default_channel", "Chat") : channel;
+		channel = channel == null ? cfg.getString("default.channel", "Chat") : channel;
 		if (!channelList.contains(channel)) {
-			plugin.log("ERROR - set 'default_channel' to one that exists...");
+			plugin.log("ERROR - set 'default.channel' to one that exists...");
 			return channelList.get(0);
 		}
 		return channelList.get(channel);

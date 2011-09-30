@@ -77,7 +77,12 @@ public class MMOChat extends MMOPlugin {
 
 	@Override
 	public void loadConfiguration(Configuration cfg) {
-		cfg.getString("default_channel", "Chat");
+		if (cfg.getKeys("").contains("default_channel")) {
+			cfg.getString("default.channel", cfg.getString("default_channel", "Chat"));
+			cfg.removeProperty("default_channel");
+		} else {
+			cfg.getString("default.channel", "Chat");
+		}
 		List<String> keys = cfg.getKeys("channel");
 		if (keys == null || keys.isEmpty()) {
 			cfg.getBoolean("channel.Chat.enabled", true);
