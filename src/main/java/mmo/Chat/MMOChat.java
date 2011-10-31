@@ -52,9 +52,10 @@ public class MMOChat extends MMOPlugin {
 	static final ChatAPI chat = ChatAPI.instance;
 	static final HashMap<Player, Widget> chatbar = new HashMap<Player, Widget>();
 
+	static public boolean config_default_color = false;
+
 	@Override
 	public EnumBitSet mmoSupport(EnumBitSet support) {
-		support.set(Support.MMO_DATABASE);
 		support.set(Support.MMO_PLAYER);
 		return support;
 	}
@@ -77,12 +78,13 @@ public class MMOChat extends MMOPlugin {
 
 	@Override
 	public void loadConfiguration(Configuration cfg) {
-		if (cfg.getKeys("").contains("default_channel")) {
+		if (cfg.getKeys().contains("default_channel")) {
 			cfg.getString("default.channel", cfg.getString("default_channel", "Chat"));
 			cfg.removeProperty("default_channel");
 		} else {
 			cfg.getString("default.channel", "Chat");
 		}
+		config_default_color = cfg.getBoolean("default.colour", config_default_color);
 		List<String> keys = cfg.getKeys("channel");
 		if (keys == null || keys.isEmpty()) {
 			cfg.getBoolean("channel.Chat.enabled", true);
@@ -171,7 +173,7 @@ public class MMOChat extends MMOPlugin {
 
 	@Override
 	public void onPlayerJoin(Player player) {
-		chat.load(player.getName());
+		chat.load(player);
 	}
 
 	@Override

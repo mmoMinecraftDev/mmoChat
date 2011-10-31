@@ -21,6 +21,7 @@ import java.util.Set;
 import mmo.Core.ChatAPI.Chat;
 import mmo.Core.util.ArrayListString;
 import mmo.Core.MMO;
+import mmo.Core.MMOMinecraft;
 import mmo.Core.MMOPlugin;
 import mmo.Core.util.HashMapString;
 import org.bukkit.ChatColor;
@@ -103,7 +104,11 @@ public class ChatAPI implements Chat {
 			for (Player to : recipients) {
 				String msg = event.getMessage(to);
 				if (msg != null && !msg.isEmpty() && seeChannel(to, channel)) {
-					String fmt = event.getFormat(to);
+					String fmt = event.getFormat(to).replaceAll("(?:&)([a-fA-F0-9])", "\u00A7$1");
+					if (MMOChat.config_default_color) {
+						msg = msg.replaceAll("(?:&)([a-fA-F0-9])", "\u00A7$1");
+					}
+					msg = msg.replaceAll("&", "\u0026");
 					plugin.sendMessage(false, to, fmt,
 							channel,
 							MMO.getColor(to, from) + from.getName() + ChatColor.WHITE,
@@ -187,13 +192,7 @@ public class ChatAPI implements Chat {
 		String name = player.getName();
 		if (channelList.contains(channel)) {
 			playerChannel.put(name, channel);
-			ChatDB row = plugin.getDatabase().find(ChatDB.class).where().ieq("player", name).findUnique();
-			if (row == null) {
-				row = new ChatDB();
-				row.setPlayer(name);
-			}
-			row.setChannel(channel);
-			plugin.getDatabase().save(row);
+			plugin.setString(player, "channel", channel);
 			return true;
 		}
 		return false;
@@ -233,11 +232,8 @@ public class ChatAPI implements Chat {
 	 * Load the default channel for a player
 	 * @param player
 	 */
-	public void load(String player) {
-		ChatDB row = plugin.getDatabase().find(ChatDB.class).setId(player).findUnique();
-		if (row != null) {
-			playerChannel.put(row.getPlayer(), row.getChannel());
-		}
+	public void load(Player player) {
+		playerChannel.put(player.getName(), plugin.getString(player, "channel", cfg.getString("default.channel", "Chat")));
 	}
 
 	/**

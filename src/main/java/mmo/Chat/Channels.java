@@ -85,17 +85,16 @@ public class Channels extends MMOListener {
 			if (isTell) {
 				event.setMessage(MMO.removeFirstWord(event.getMessage()));
 			}
-			HashSet<Player> keep = new HashSet<Player>();
+			recipients.clear();
 			if (to != null) {
 				tells.put(to.getName(), from.getName());
-				keep.add(from);
-				keep.add(to);
+				recipients.add(from);
+				recipients.add(to);
 				event.setFormat(to, event.getFormat().replaceAll("%2\\$s", "%2\\$s&f tells you"));
 				event.setFormat(from, event.getFormat().replaceAll("%2\\$s", "You tell " + MMO.getColor(from, to) + to.getName() + ChatColor.WHITE));
 			} else {
 				tells.remove(from.getName());
 			}
-			recipients.retainAll(keep);
 		}
 	}
 }
