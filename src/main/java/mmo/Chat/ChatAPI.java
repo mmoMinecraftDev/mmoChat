@@ -17,11 +17,11 @@
 package mmo.Chat;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import mmo.Core.ChatAPI.Chat;
 import mmo.Core.util.ArrayListString;
 import mmo.Core.MMO;
-import mmo.Core.MMOMinecraft;
 import mmo.Core.MMOPlugin;
 import mmo.Core.util.HashMapString;
 import org.bukkit.ChatColor;
@@ -40,7 +40,7 @@ public class ChatAPI implements Chat {
 	final static ArrayListString channelList = new ArrayListString();
 	final static HashMapString<String> aliasList = new HashMapString<String>();
 	final static HashMapString<String> playerChannel = new HashMapString<String>();
-	final static HashMapString<ArrayListString> playerHidden = new HashMapString<ArrayListString>();
+	final static HashMapString<List<String>> playerHidden = new HashMapString<List<String>>();
 	static MMOPlugin plugin;
 	static Configuration cfg;
 
@@ -123,13 +123,14 @@ public class ChatAPI implements Chat {
 	@Override
 	public boolean hideChannel(Player player, String channel) {
 		if (channelList.contains(channel)) {
-			ArrayListString list = playerHidden.get(player.getName());
+			List<String> list = playerHidden.get(player.getName());
 			if (list == null) {
 				playerHidden.put(player.getName(), list = new ArrayListString());
 			}
 			if (!list.contains(channel)) {
 				list.add(channel);
 			}
+			plugin.setStringList(player, "hidden", list);
 			return true;
 		}
 		return false;
@@ -138,13 +139,14 @@ public class ChatAPI implements Chat {
 	@Override
 	public boolean showChannel(Player player, String channel) {
 		if (channelList.contains(channel)) {
-			ArrayListString list = playerHidden.get(player.getName());
+			List<String> list = playerHidden.get(player.getName());
 			if (list == null) {
 				playerHidden.put(player.getName(), list = new ArrayListString());
 			}
 			if (list.contains(channel)) {
 				list.remove(channel);
 			}
+			plugin.setStringList(player, "hidden", list);
 			return true;
 		}
 		return false;
@@ -234,6 +236,7 @@ public class ChatAPI implements Chat {
 	 */
 	public void load(Player player) {
 		playerChannel.put(player.getName(), plugin.getString(player, "channel", cfg.getString("default.channel", "Chat")));
+		playerHidden.put(player.getName(), plugin.getStringList(player, "hidden", null));
 	}
 
 	/**
@@ -242,5 +245,6 @@ public class ChatAPI implements Chat {
 	 */
 	public void unload(String player) {
 		playerChannel.remove(player);
+		playerHidden.remove(player);
 	}
 }
