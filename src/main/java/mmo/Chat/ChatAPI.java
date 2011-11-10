@@ -236,7 +236,7 @@ public class ChatAPI implements Chat {
 	 */
 	public void load(Player player) {
 		playerChannel.put(player.getName(), plugin.getString(player, "channel", cfg.getString("default.channel", "Chat")));
-		playerHidden.put(player.getName(), plugin.getStringList(player, "hidden", null));
+		playerHidden.put(player.getName(), plugin.getStringList(player, "hidden", new ArrayList<String>()));
 	}
 
 	/**
