@@ -217,10 +217,10 @@ public class MMOChat extends MMOPlugin {
 				SpoutPlayer player = event.getPlayer();
 				Widget label, bar = new GenericContainer(
 						label = new GenericLabel(ChatColor.GRAY + chat.getChannel(player)).setResize(true).setFixed(true).setMargin(3, 3, 0, 3),
-						new GenericGradient().setBottomColor(black).setTopColor(black).setPriority(RenderPriority.Highest),
-						new GenericGradient().setBottomColor(white).setTopColor(white).setMaxWidth(1).setPriority(RenderPriority.High),
-						new GenericGradient().setBottomColor(white).setTopColor(white).setMaxWidth(1).setMarginLeft(label.getWidth() + 5).setPriority(RenderPriority.High),
-						new GenericGradient().setBottomColor(white).setTopColor(white).setMaxHeight(1).setPriority(RenderPriority.High)
+						new GenericGradient(black).setPriority(RenderPriority.Highest),
+						new GenericGradient(white).setMaxWidth(1).setPriority(RenderPriority.High),
+						new GenericGradient(white).setMaxWidth(1).setMarginLeft(label.getWidth() + 5).setPriority(RenderPriority.High),
+						new GenericGradient(white).setMaxHeight(1).setPriority(RenderPriority.High)
 					).setLayout(ContainerType.OVERLAY).setAnchor(WidgetAnchor.BOTTOM_LEFT).setY(-27).setX(4).setHeight(13).setWidth(label.getWidth() + 6).setVisible(false);
 				chatbar.put(player, bar);
 				player.getMainScreen().attachWidget(plugin, bar);
