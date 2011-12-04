@@ -224,9 +224,7 @@ public class MMOChat extends MMOPlugin {
 					).setLayout(ContainerType.OVERLAY).setAnchor(WidgetAnchor.BOTTOM_LEFT).setY(-27).setX(4).setHeight(13).setWidth(label.getWidth() + 6).setVisible(false);
 				chatbar.put(player, bar);
 				player.getMainScreen().attachWidget(plugin, bar);
-				if (bar != null) {
-					bar.setVisible(true).setDirty(true);
-				}
+				bar.setVisible(true);
 			}
 		}
 
@@ -235,7 +233,7 @@ public class MMOChat extends MMOPlugin {
 			if (!event.isCancelled() && event.getScreenType() == ScreenType.CHAT_SCREEN) {
 				Widget bar = chatbar.remove(event.getPlayer());
 				if (bar != null) {
-					bar.setVisible(false).setDirty(true);
+					bar.setVisible(false);
 				}
 			}
 		}

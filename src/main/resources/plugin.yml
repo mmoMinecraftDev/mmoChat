@@ -3,7 +3,7 @@ main: mmo.Chat.MMOChat
 version: 1.5
 website: http://forums.bukkit.org/threads/
 author: Rycochet <rycochet@rycochet.com>
-depend: [mmoCore]
+depend: [Spout,mmoCore]
 
 description: Utility functions for mmo-minecraft
 
