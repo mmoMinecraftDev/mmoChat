@@ -215,15 +215,18 @@ public class MMOChat extends MMOPlugin {
 			if (!event.isCancelled() && event.getScreenType() == ScreenType.CHAT_SCREEN) {
 				Color black = new Color(0f, 0f, 0f, 0.5f), white = new Color(1f, 1f, 1f, 0.5f);
 				SpoutPlayer player = event.getPlayer();
-				Widget label, bar = new GenericContainer(
-						label = new GenericLabel(ChatColor.GRAY + chat.getChannel(player)).setResize(true).setFixed(true).setMargin(3, 3, 0, 3),
-						new GenericGradient(black).setPriority(RenderPriority.Highest),
-						new GenericGradient(white).setMaxWidth(1).setPriority(RenderPriority.High),
-						new GenericGradient(white).setMaxWidth(1).setMarginLeft(label.getWidth() + 5).setPriority(RenderPriority.High),
-						new GenericGradient(white).setMaxHeight(1).setPriority(RenderPriority.High)
-					).setLayout(ContainerType.OVERLAY).setAnchor(WidgetAnchor.BOTTOM_LEFT).setY(-27).setX(4).setHeight(13).setWidth(label.getWidth() + 6).setVisible(false);
-				chatbar.put(player, bar);
-				player.getMainScreen().attachWidget(plugin, bar);
+				Widget label, bar = chatbar.get(player);
+				if (bar == null) {
+					bar = new GenericContainer(
+							label = new GenericLabel(ChatColor.GRAY + chat.getChannel(player)).setResize(true).setFixed(true).setMargin(3, 3, 0, 3),
+							new GenericGradient(black).setPriority(RenderPriority.Highest),
+							new GenericGradient(white).setMaxWidth(1).setPriority(RenderPriority.High),
+							new GenericGradient(white).setMaxWidth(1).setMarginLeft(label.getWidth() + 5).setPriority(RenderPriority.High),
+							new GenericGradient(white).setMaxHeight(1).setPriority(RenderPriority.High)
+						).setLayout(ContainerType.OVERLAY).setAnchor(WidgetAnchor.BOTTOM_LEFT).setY(-27).setX(4).setHeight(13).setWidth(label.getWidth() + 6).setVisible(false);
+					chatbar.put(player, bar);
+					player.getMainScreen().attachWidget(plugin, bar);
+				}
 				bar.setVisible(true);
 			}
 		}
