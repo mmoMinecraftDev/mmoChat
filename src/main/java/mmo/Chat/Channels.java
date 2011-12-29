@@ -94,6 +94,7 @@ public class Channels extends MMOListener {
 				event.setFormat(from, event.getFormat().replaceAll("%2\\$s", "You tell " + MMO.getColor(from, to) + to.getName() + ChatColor.WHITE));
 			} else {
 				tells.remove(from.getName());
+				event.setCancelled(true);
 			}
 		}
 	}

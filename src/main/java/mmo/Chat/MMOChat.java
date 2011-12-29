@@ -53,6 +53,7 @@ public class MMOChat extends MMOPlugin {
 	static final HashMap<Player, Widget> chatbar = new HashMap<Player, Widget>();
 
 	static public boolean config_default_color = false;
+	static public boolean config_replace_vanilla_chat = true;
 
 	@Override
 	public EnumBitSet mmoSupport(EnumBitSet support) {
@@ -85,6 +86,7 @@ public class MMOChat extends MMOPlugin {
 			cfg.getString("default.channel", "Chat");
 		}
 		config_default_color = cfg.getBoolean("default.colour", config_default_color);
+		config_replace_vanilla_chat = cfg.getBoolean("replace_vanilla_chat", config_replace_vanilla_chat);
 		List<String> keys = cfg.getKeys("channel");
 		if (keys == null || keys.isEmpty()) {
 			cfg.getBoolean("channel.Chat.enabled", true);
@@ -185,7 +187,7 @@ public class MMOChat extends MMOPlugin {
 
 		@Override
 		public void onPlayerChat(PlayerChatEvent event) {
-			if (chat.doChat(null, event.getPlayer(), event.getMessage())) {
+			if (chat.doChat(null, event.getPlayer(), event.getMessage()) || config_replace_vanilla_chat) {
 				event.setCancelled(true);
 			}
 		}
@@ -196,12 +198,12 @@ public class MMOChat extends MMOPlugin {
 			String channel = MMO.firstWord(message);
 			if (channel != null && !channel.isEmpty()) {
 				channel = channel.substring(1);
-				if ("me".equalsIgnoreCase(channel)
-						&& chat.doChat(null, event.getPlayer(), message)) {
-					event.setCancelled(true);
-				} else if ((channel = chat.findChannel(channel)) != null
+				if (("me".equalsIgnoreCase(channel)
+						&& chat.doChat(null, event.getPlayer(), message))
+				|| ((channel = chat.findChannel(channel)) != null
 						&& cfg.getBoolean("channel." + channel + ".command", true)
-						&& chat.doChat(channel, event.getPlayer(), MMO.removeFirstWord(message))) {
+						&& (chat.doChat(channel, event.getPlayer(), MMO.removeFirstWord(message))
+							|| config_replace_vanilla_chat))) {
 					event.setCancelled(true);
 				}
 			}

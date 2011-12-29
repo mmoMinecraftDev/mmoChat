@@ -95,7 +95,7 @@ public class ChatAPI implements Chat {
 		MMOChatEventAPI event = new MMOChatEventAPI(from, filters, args, format, message);
 		plugin.getServer().getPluginManager().callEvent(event);
 		Set<Player> recipients = event.getRecipients();
-		if (recipients.isEmpty()) {
+		if (event.isCancelled() || recipients.isEmpty()) {
 			plugin.sendMessage(from, "You seem to be talking to yourself...");
 		} else {
 			if (cfg.getBoolean("channel." + channel + ".log", false)) {
