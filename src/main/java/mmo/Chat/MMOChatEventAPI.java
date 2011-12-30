@@ -50,7 +50,7 @@ public class MMOChatEventAPI extends Event implements MMOChatEvent {
 
 	@Override
 	public boolean hasFilter(String filter) {
-		return filters.contains(filter);
+		return filters.contains(filter.toLowerCase());
 	}
 
 	@Override

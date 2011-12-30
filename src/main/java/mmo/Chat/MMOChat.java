@@ -89,40 +89,55 @@ public class MMOChat extends MMOPlugin {
 		config_replace_vanilla_chat = cfg.getBoolean("replace_vanilla_chat", config_replace_vanilla_chat);
 		List<String> keys = cfg.getKeys("channel");
 		if (keys == null || keys.isEmpty()) {
+			List<String> list = new ArrayList();
+
+			list.add("Server");
 			cfg.getBoolean("channel.Chat.enabled", true);
 			cfg.getBoolean("channel.Chat.command", true);
 			cfg.getBoolean("channel.Chat.log", true);
-			cfg.getString("channel.Chat.filters", "Server");
+			cfg.getStringList("channel.Chat.filters", list);
 
+			list.clear();
+			list.add("World");
 			cfg.getBoolean("channel.Shout.enabled", true);
 			cfg.getBoolean("channel.Shout.command", true);
 			cfg.getBoolean("channel.Shout.log", true);
-			cfg.getString("channel.Shout.filters", "World");
+			cfg.getStringList("channel.Shout.filters", list);
 
+			list.clear();
+			list.add("Yell");
 			cfg.getBoolean("channel.Yell.enabled", true);
 			cfg.getBoolean("channel.Yell.command", true);
 			cfg.getBoolean("channel.Yell.log", true);
-			cfg.getString("channel.Yell.filters", "Yell");
+			cfg.getStringList("channel.Yell.filters", list);
 
+			list.clear();
+			list.add("Say");
 			cfg.getBoolean("channel.Say.enabled", true);
 			cfg.getBoolean("channel.Say.command", true);
 			cfg.getBoolean("channel.Say.log", true);
-			cfg.getString("channel.Say.filters", "Say");
+			cfg.getStringList("channel.Say.filters", list);
 
+			list.clear();
+			list.add("Tell");
 			cfg.getBoolean("channel.Tell.enabled", true);
 			cfg.getBoolean("channel.Tell.command", true);
 			cfg.getBoolean("channel.Tell.log", false);
-			cfg.getString("channel.Tell.filters", "Tell");
+			cfg.getStringList("channel.Tell.filters", list);
 
+			list.clear();
+			list.add("Reply");
 			cfg.getBoolean("channel.Reply.enabled", true);
 			cfg.getBoolean("channel.Reply.command", true);
 			cfg.getBoolean("channel.Reply.log", false);
-			cfg.getString("channel.Reply.filters", "Reply");
+			cfg.getStringList("channel.Reply.filters", list);
 
+			list.clear();
+			list.add("Party");
 			cfg.getBoolean("channel.Party.enabled", false);
 			cfg.getBoolean("channel.Party.command", false);
 			cfg.getBoolean("channel.Party.log", false);
-			cfg.getString("channel.Party.filters", "Party");
+			cfg.getStringList("channel.Party.filters", list);
 		}
 		for (String channel : cfg.getKeys("channel")) {
 			// Add all channels, even disabled ones - check is dynamic

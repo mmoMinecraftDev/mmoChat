@@ -17,7 +17,9 @@
 package mmo.Chat;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import mmo.Core.ChatAPI.Chat;
 import mmo.Core.util.ArrayListString;
@@ -85,12 +87,16 @@ public class ChatAPI implements Chat {
 		if (format == null) {
 			format = me ? "[%1$s] * %2$s %4$s" : "[%1$s] %2$s: %4$s";
 		}
-		ArrayListString filters = new ArrayListString();
-		HashMapString<String[]> args = new HashMapString<String[]>();
-		for (String filter : cfg.getStringList("channel." + channel + ".filters", new ArrayList<String>())) {
-			String name = MMO.firstWord(filter);
-			filters.add(name.toLowerCase());
-			args.put(name.toLowerCase(), MMO.smartSplit(MMO.removeFirstWord(filter)));
+		List<String> filters = new ArrayList<String>();
+		Map<String,String[]> args = new HashMap<String,String[]>();
+		List<String> filterlist = cfg.getStringList("channel." + channel + ".filters", new ArrayList<String>());
+		if (filterlist.isEmpty()) {
+			filterlist.add(cfg.getString("channel." + channel + ".filters", "Server"));
+		}
+		for (String filter : filterlist) {
+			String name = MMO.firstWord(filter).toLowerCase();
+			filters.add(name);
+			args.put(name, MMO.smartSplit(MMO.removeFirstWord(filter)));
 		}
 		MMOChatEventAPI event = new MMOChatEventAPI(from, filters, args, format, message);
 		plugin.getServer().getPluginManager().callEvent(event);
