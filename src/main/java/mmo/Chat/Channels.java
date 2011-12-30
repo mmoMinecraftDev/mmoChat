@@ -34,10 +34,10 @@ public class Channels extends MMOListener {
 	public void onMMOChat(MMOChatEvent event) {
 		Player from = event.getPlayer();
 		Set<Player> recipients = event.getRecipients();
-		if (event.hasFilter("Disabled")) {
+		if (event.hasFilter("disabled")) {
 			recipients.clear();
 		}
-		if (event.hasFilter("Say")) {
+		if (event.hasFilter("say")) {
 			for (Player to : new HashSet<Player>(recipients)) {
 				if (from.getWorld() != to.getWorld()
 						  || from.getLocation().distance(to.getLocation()) > 25) {
@@ -45,9 +45,9 @@ public class Channels extends MMOListener {
 				}
 			}
 		}
-		if (event.hasFilter("Range")) {
+		if (event.hasFilter("range")) {
 			int range = 100;
-			String[] args = event.getArgs("Range");
+			String[] args = event.getArgs("range");
 			if (args.length > 0) {
 				range = Integer.parseInt(args[0]);
 			}
@@ -58,7 +58,7 @@ public class Channels extends MMOListener {
 				}
 			}
 		}
-		if (event.hasFilter("Yell")) {
+		if (event.hasFilter("yell")) {
 			for (Player to : new HashSet<Player>(recipients)) {
 				if (from.getWorld() != to.getWorld()
 						  || from.getLocation().distance(to.getLocation()) > 300) {
@@ -66,18 +66,18 @@ public class Channels extends MMOListener {
 				}
 			}
 		}
-		if (event.hasFilter("World")) {
+		if (event.hasFilter("world")) {
 			for (Player to : new HashSet<Player>(recipients)) {
 				if (from.getWorld() != to.getWorld()) {
 					recipients.remove(to);
 				}
 			}
 		}
-		if (event.hasFilter("Server")) {
+		if (event.hasFilter("server")) {
 			// Should really refresh the target list...
 		}
-		boolean isTell = event.hasFilter("Tell");
-		if (isTell || event.hasFilter("Reply")) {
+		boolean isTell = event.hasFilter("tell");
+		if (isTell || event.hasFilter("reply")) {
 			Player to = Bukkit.getServer().getPlayer(
 					  isTell
 					  ? MMO.firstWord(event.getMessage())

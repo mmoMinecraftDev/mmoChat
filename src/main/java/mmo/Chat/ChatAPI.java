@@ -89,8 +89,8 @@ public class ChatAPI implements Chat {
 		HashMapString<String[]> args = new HashMapString<String[]>();
 		for (String filter : cfg.getStringList("channel." + channel + ".filters", new ArrayList<String>())) {
 			String name = MMO.firstWord(filter);
-			filters.add(name);
-			args.put(name, MMO.smartSplit(MMO.removeFirstWord(filter)));
+			filters.add(name.toLowerCase());
+			args.put(name.toLowerCase(), MMO.smartSplit(MMO.removeFirstWord(filter)));
 		}
 		MMOChatEventAPI event = new MMOChatEventAPI(from, filters, args, format, message);
 		plugin.getServer().getPluginManager().callEvent(event);

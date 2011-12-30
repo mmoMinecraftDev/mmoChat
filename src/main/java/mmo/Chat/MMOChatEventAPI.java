@@ -28,17 +28,17 @@ import org.bukkit.event.Event;
 
 public class MMOChatEventAPI extends Event implements MMOChatEvent {
 
-	private final List filters;
-	private final HashMap<Player, String> messages = new HashMap<Player, String>();
-	private final HashMap<Player, String> formats = new HashMap<Player, String>();
-	private final HashSet<Player> recipients;
+	private final List<String> filters;
+	private final Map<Player, String> messages = new HashMap<Player, String>();
+	private final Map<Player, String> formats = new HashMap<Player, String>();
+	private final Set<Player> recipients;
 	protected Player player;
 	private String message;
 	private String format;
 	private boolean cancel = false;
 	private Map<String,String[]> args = null;
 
-	public MMOChatEventAPI(final Player player, final List filters, final Map<String,String[]> args, final String format, final String message) {
+	public MMOChatEventAPI(final Player player, final List<String> filters, final Map<String,String[]> args, final String format, final String message) {
 		super("mmoChatEvent");
 		this.recipients = new HashSet<Player>(Arrays.asList(player.getServer().getOnlinePlayers()));
 		this.player = player;
