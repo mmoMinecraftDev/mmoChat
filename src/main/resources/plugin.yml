@@ -1,6 +1,6 @@
 name: mmoChat
 main: mmo.Chat.MMOChat
-version: 1.7
+version: 1.8
 website: http://forums.bukkit.org/threads/
 author: Rycochet <rycochet@rycochet.com>
 depend: [Spout,mmoCore]
