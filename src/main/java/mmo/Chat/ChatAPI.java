@@ -113,12 +113,13 @@ public class ChatAPI implements Chat {
 					String fmt = event.getFormat(to).replaceAll("(?:&)([a-fA-F0-9])", "\u00A7$1");
 					if (MMOChat.config_default_color) {
 						msg = msg.replaceAll("(?:&)([a-fA-F0-9])", "\u00A7$1");
+					} else {
+						msg = msg.replaceAll("(?:&)([a-fA-F0-9])", "");
 					}
-					msg = msg.replaceAll("&", "\u0026");
 					plugin.sendMessage(false, to, fmt,
 							channel,
-							MMO.getColor(to, from) + from.getName() + ChatColor.WHITE,
-							MMO.getColor(from, to) + to.getName() + ChatColor.WHITE,
+							MMO.getName(to, from) + ChatColor.WHITE,
+							MMO.getName(from, to) + ChatColor.WHITE,
 							msg);
 				}
 			}
