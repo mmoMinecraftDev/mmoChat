@@ -16,50 +16,30 @@
  */
 package mmo.Chat;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import mmo.Core.MMO;
 import mmo.Core.MMOMinecraft;
 import mmo.Core.MMOPlugin;
-import mmo.Core.util.EnumBitSet;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event.Priority;
-import org.bukkit.event.Event.Type;
-import org.bukkit.event.player.PlayerChatEvent;
-import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerListener;
-import org.bukkit.util.config.Configuration;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.*;
 import org.getspout.spoutapi.event.screen.ScreenCloseEvent;
-import org.getspout.spoutapi.event.screen.ScreenListener;
 import org.getspout.spoutapi.event.screen.ScreenOpenEvent;
-import org.getspout.spoutapi.gui.Color;
-import org.getspout.spoutapi.gui.ContainerType;
-import org.getspout.spoutapi.gui.GenericContainer;
-import org.getspout.spoutapi.gui.GenericGradient;
-import org.getspout.spoutapi.gui.GenericLabel;
-import org.getspout.spoutapi.gui.RenderPriority;
-import org.getspout.spoutapi.gui.ScreenType;
-import org.getspout.spoutapi.gui.Widget;
-import org.getspout.spoutapi.gui.WidgetAnchor;
+import org.getspout.spoutapi.gui.*;
 import org.getspout.spoutapi.player.SpoutPlayer;
 
-public class MMOChat extends MMOPlugin {
+public class MMOChat extends MMOPlugin implements Listener {
 
 	static final ChatAPI chat = ChatAPI.instance;
 	static final HashMap<Player, Widget> chatbar = new HashMap<Player, Widget>();
-
 	static public boolean config_default_color = false;
 	static public boolean config_replace_vanilla_chat = true;
-
-	@Override
-	public EnumBitSet mmoSupport(EnumBitSet support) {
-		support.set(Support.MMO_PLAYER);
-		return support;
-	}
 
 	@Override
 	public void onEnable() {
@@ -67,83 +47,80 @@ public class MMOChat extends MMOPlugin {
 		ChatAPI.plugin = this;
 		ChatAPI.cfg = cfg;
 		MMOMinecraft.addAPI(chat);
-
-		mmoPlayerListener mpl = new mmoPlayerListener();
-		pm.registerEvent(Type.PLAYER_CHAT, mpl, Priority.Normal, this);
-		pm.registerEvent(Type.PLAYER_COMMAND_PREPROCESS, mpl, Priority.Normal, this);
-
-		pm.registerEvent(Type.CUSTOM_EVENT, new Channels(), Priority.Normal, this);
-
-		pm.registerEvent(Type.CUSTOM_EVENT, new mmoScreenListener(), Priority.Monitor, this);
+		pm.registerEvents(this, this);
+		pm.registerEvents(new Channels(), this);
 	}
 
 	@Override
-	public void loadConfiguration(Configuration cfg) {
-		if (cfg.getKeys().contains("default_channel")) {
+	public void loadConfiguration(final FileConfiguration cfg) {
+		if (cfg.contains("default_channel")) {
 			cfg.getString("default.channel", cfg.getString("default_channel", "Chat"));
-			cfg.removeProperty("default_channel");
+//			cfg.removeProperty("default_channel");
 		} else {
 			cfg.getString("default.channel", "Chat");
 		}
 		config_default_color = cfg.getBoolean("default.colour", config_default_color);
 		config_replace_vanilla_chat = cfg.getBoolean("replace_vanilla_chat", config_replace_vanilla_chat);
-		List<String> keys = cfg.getKeys("channel");
+		final Set<String> keys = cfg.getConfigurationSection("channel").getKeys(false);
 		if (keys == null || keys.isEmpty()) {
-			List<String> list = new ArrayList();
+			final List<String> list = new ArrayList();
 
 			list.add("Server");
-			cfg.getBoolean("channel.Chat.enabled", true);
-			cfg.getBoolean("channel.Chat.command", true);
-			cfg.getBoolean("channel.Chat.log", true);
-			cfg.getStringList("channel.Chat.filters", list);
+			cfg.addDefault("channel.Chat.enabled", true);
+			cfg.addDefault("channel.Chat.command", true);
+			cfg.addDefault("channel.Chat.log", true);
+			cfg.addDefault("channel.Chat.filters", list);
 
 			list.clear();
 			list.add("World");
-			cfg.getBoolean("channel.Shout.enabled", true);
-			cfg.getBoolean("channel.Shout.command", true);
-			cfg.getBoolean("channel.Shout.log", true);
-			cfg.getStringList("channel.Shout.filters", list);
+			cfg.addDefault("channel.Shout.enabled", true);
+			cfg.addDefault("channel.Shout.command", true);
+			cfg.addDefault("channel.Shout.log", true);
+			cfg.addDefault("channel.Shout.filters", list);
 
 			list.clear();
 			list.add("Yell");
-			cfg.getBoolean("channel.Yell.enabled", true);
-			cfg.getBoolean("channel.Yell.command", true);
-			cfg.getBoolean("channel.Yell.log", true);
-			cfg.getStringList("channel.Yell.filters", list);
+			cfg.addDefault("channel.Yell.enabled", true);
+			cfg.addDefault("channel.Yell.command", true);
+			cfg.addDefault("channel.Yell.log", true);
+			cfg.addDefault("channel.Yell.filters", list);
 
 			list.clear();
 			list.add("Say");
-			cfg.getBoolean("channel.Say.enabled", true);
-			cfg.getBoolean("channel.Say.command", true);
-			cfg.getBoolean("channel.Say.log", true);
-			cfg.getStringList("channel.Say.filters", list);
+			cfg.addDefault("channel.Say.enabled", true);
+			cfg.addDefault("channel.Say.command", true);
+			cfg.addDefault("channel.Say.log", true);
+			cfg.addDefault("channel.Say.filters", list);
 
 			list.clear();
 			list.add("Tell");
-			cfg.getBoolean("channel.Tell.enabled", true);
-			cfg.getBoolean("channel.Tell.command", true);
-			cfg.getBoolean("channel.Tell.log", false);
-			cfg.getStringList("channel.Tell.filters", list);
+			cfg.addDefault("channel.Tell.enabled", true);
+			cfg.addDefault("channel.Tell.command", true);
+			cfg.addDefault("channel.Tell.log", false);
+			cfg.addDefault("channel.Tell.filters", list);
 
 			list.clear();
 			list.add("Reply");
-			cfg.getBoolean("channel.Reply.enabled", true);
-			cfg.getBoolean("channel.Reply.command", true);
-			cfg.getBoolean("channel.Reply.log", false);
-			cfg.getStringList("channel.Reply.filters", list);
+			cfg.addDefault("channel.Reply.enabled", true);
+			cfg.addDefault("channel.Reply.command", true);
+			cfg.addDefault("channel.Reply.log", false);
+			cfg.addDefault("channel.Reply.filters", list);
 
 			list.clear();
 			list.add("Party");
-			cfg.getBoolean("channel.Party.enabled", false);
-			cfg.getBoolean("channel.Party.command", false);
-			cfg.getBoolean("channel.Party.log", false);
-			cfg.getStringList("channel.Party.filters", list);
-		}
-		for (String channel : cfg.getKeys("channel")) {
-			// Add all channels, even disabled ones - check is dynamic
-			chat.addChannel(channel);
-			for (String alias : cfg.getStringList("channel." + channel + ".alias", new ArrayList<String>())) {
-				chat.addAlias(channel, alias);
+			cfg.addDefault("channel.Party.enabled", false);
+			cfg.addDefault("channel.Party.command", false);
+			cfg.addDefault("channel.Party.log", false);
+			cfg.addDefault("channel.Party.filters", list);
+		} else {
+			for (final Iterator<String> it = keys.iterator(); it.hasNext();) {
+				final String channel = it.next();
+				chat.addChannel(channel);
+				if (cfg.isList("channel." + channel + ".alias")) {
+					for (String alias : cfg.getStringList("channel." + channel + ".alias")) {
+						chat.addAlias(channel, alias);
+					}
+				}
 			}
 		}
 	}
@@ -188,73 +165,71 @@ public class MMOChat extends MMOPlugin {
 		return list;
 	}
 
-	@Override
-	public void onPlayerJoin(Player player) {
-		chat.load(player);
+	@EventHandler(priority = EventPriority.NORMAL)
+	public void onPlayerJoin(final PlayerJoinEvent event) {
+		chat.load(event.getPlayer());
 	}
 
-	@Override
-	public void onPlayerQuit(Player player) {
-		chat.unload(player.getName());
+	@EventHandler(priority = EventPriority.NORMAL)
+	public void onPlayerQuit(final PlayerQuitEvent event) {
+		chat.unload(event.getPlayer().getName());
 	}
 
-	public class mmoPlayerListener extends PlayerListener {
+	@EventHandler(priority = EventPriority.NORMAL)
+	public void onPlayerKick(final PlayerKickEvent event) {
+		chat.unload(event.getPlayer().getName());
+	}
 
-		@Override
-		public void onPlayerChat(PlayerChatEvent event) {
-			if (chat.doChat(null, event.getPlayer(), event.getMessage()) || config_replace_vanilla_chat) {
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void onPlayerChat(final PlayerChatEvent event) {
+		if (chat.doChat(null, event.getPlayer(), event.getMessage()) || config_replace_vanilla_chat) {
+			event.setCancelled(true);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void onPlayerCommandPreprocess(final PlayerCommandPreprocessEvent event) {
+		String message = event.getMessage();
+		String channel = MMO.firstWord(message);
+		if (channel != null && !channel.isEmpty()) {
+			channel = channel.substring(1);
+			if (("me".equalsIgnoreCase(channel)
+					&& chat.doChat(null, event.getPlayer(), message))
+					|| ((channel = chat.findChannel(channel)) != null
+					&& cfg.getBoolean("channel." + channel + ".command", true)
+					&& (chat.doChat(channel, event.getPlayer(), MMO.removeFirstWord(message))
+					|| config_replace_vanilla_chat))) {
 				event.setCancelled(true);
 			}
 		}
+	}
 
-		@Override
-		public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
-			String message = event.getMessage();
-			String channel = MMO.firstWord(message);
-			if (channel != null && !channel.isEmpty()) {
-				channel = channel.substring(1);
-				if (("me".equalsIgnoreCase(channel)
-						&& chat.doChat(null, event.getPlayer(), message))
-				|| ((channel = chat.findChannel(channel)) != null
-						&& cfg.getBoolean("channel." + channel + ".command", true)
-						&& (chat.doChat(channel, event.getPlayer(), MMO.removeFirstWord(message))
-							|| config_replace_vanilla_chat))) {
-					event.setCancelled(true);
-				}
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void onScreenOpen(final ScreenOpenEvent event) {
+		if (!event.isCancelled() && event.getScreenType() == ScreenType.CHAT_SCREEN) {
+			Color black = new Color(0f, 0f, 0f, 0.5f), white = new Color(1f, 1f, 1f, 0.5f);
+			SpoutPlayer player = event.getPlayer();
+			Widget label, bar = chatbar.get(player);
+			if (bar == null) {
+				bar = new GenericContainer(
+						label = new GenericLabel(ChatColor.GRAY + chat.getChannel(player)).setResize(true).setFixed(true).setMargin(3, 3, 0, 3),
+						new GenericGradient(black).setPriority(RenderPriority.Highest),
+						new GenericGradient(white).setMaxWidth(1).setPriority(RenderPriority.High),
+						new GenericGradient(white).setMaxWidth(1).setMarginLeft(label.getWidth() + 5).setPriority(RenderPriority.High),
+						new GenericGradient(white).setMaxHeight(1).setPriority(RenderPriority.High)).setLayout(ContainerType.OVERLAY).setAnchor(WidgetAnchor.BOTTOM_LEFT).setY(-27).setX(4).setHeight(13).setWidth(label.getWidth() + 6).setVisible(false);
+				chatbar.put(player, bar);
+				player.getMainScreen().attachWidget(plugin, bar);
 			}
+			bar.setVisible(true);
 		}
 	}
 
-	public class mmoScreenListener extends ScreenListener {
-
-		@Override
-		public void onScreenOpen(ScreenOpenEvent event) {
-			if (!event.isCancelled() && event.getScreenType() == ScreenType.CHAT_SCREEN) {
-				Color black = new Color(0f, 0f, 0f, 0.5f), white = new Color(1f, 1f, 1f, 0.5f);
-				SpoutPlayer player = event.getPlayer();
-				Widget label, bar = chatbar.get(player);
-				if (bar == null) {
-					bar = new GenericContainer(
-							label = new GenericLabel(ChatColor.GRAY + chat.getChannel(player)).setResize(true).setFixed(true).setMargin(3, 3, 0, 3),
-							new GenericGradient(black).setPriority(RenderPriority.Highest),
-							new GenericGradient(white).setMaxWidth(1).setPriority(RenderPriority.High),
-							new GenericGradient(white).setMaxWidth(1).setMarginLeft(label.getWidth() + 5).setPriority(RenderPriority.High),
-							new GenericGradient(white).setMaxHeight(1).setPriority(RenderPriority.High)
-						).setLayout(ContainerType.OVERLAY).setAnchor(WidgetAnchor.BOTTOM_LEFT).setY(-27).setX(4).setHeight(13).setWidth(label.getWidth() + 6).setVisible(false);
-					chatbar.put(player, bar);
-					player.getMainScreen().attachWidget(plugin, bar);
-				}
-				bar.setVisible(true);
-			}
-		}
-
-		@Override
-		public void onScreenClose(ScreenCloseEvent event) {
-			if (!event.isCancelled() && event.getScreenType() == ScreenType.CHAT_SCREEN) {
-				Widget bar = chatbar.remove(event.getPlayer());
-				if (bar != null) {
-					bar.setVisible(false);
-				}
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void onScreenClose(final ScreenCloseEvent event) {
+		if (!event.isCancelled() && event.getScreenType() == ScreenType.CHAT_SCREEN) {
+			Widget bar = chatbar.remove(event.getPlayer());
+			if (bar != null) {
+				bar.setVisible(false);
 			}
 		}
 	}

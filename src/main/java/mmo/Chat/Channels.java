@@ -17,84 +17,80 @@
 package mmo.Chat;
 
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import mmo.Core.ChatAPI.MMOChatEvent;
 import mmo.Core.MMO;
-import mmo.Core.MMOListener;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 
-public class Channels extends MMOListener {
+public class Channels implements Listener {
 
-	public static HashMap<String, String> tells = new HashMap<String, String>();
+	private static HashMap<String, String> tells = new HashMap<String, String>();
+	private static final int SAY_RANGE = 25;
+	private static final int YELL_RANGE = 300;
+	private static final int DEFAULT_RANGE = 100;
 
-	@Override
-	public void onMMOChat(MMOChatEvent event) {
-		Player from = event.getPlayer();
-		Set<Player> recipients = event.getRecipients();
+	@EventHandler
+	public void onMMOChat(final MMOChatEvent event) {
+		final Player from = event.getPlayer();
+		final Set<Player> recipients = event.getRecipients();
 		if (event.hasFilter("disabled")) {
 			recipients.clear();
-		}
-		if (event.hasFilter("say")) {
-			for (Player to : new HashSet<Player>(recipients)) {
-				if (from.getWorld() != to.getWorld()
-						  || from.getLocation().distance(to.getLocation()) > 25) {
-					recipients.remove(to);
+		} else if (event.hasFilter("server")) {
+			// Should really refresh the target list...
+		} else if (event.hasFilter("world") || event.hasFilter("say") || event.hasFilter("range") || event.hasFilter("yell")) {
+			// Some channels have an implied "world" filter
+			for (final Iterator<Player> it = recipients.iterator(); it.hasNext();) {
+				final Player to = it.next();
+				if (from.getWorld() != to.getWorld()) {
+					it.remove();
 				}
 			}
 		}
-		if (event.hasFilter("range")) {
-			int range = 100;
-			String[] args = event.getArgs("range");
+		int range = -1;
+		if (event.hasFilter("say")) {
+			range = SAY_RANGE;
+		} else if (event.hasFilter("range")) {
+			final String[] args = event.getArgs("range");
 			if (args.length > 0) {
 				range = Integer.parseInt(args[0]);
+			} else {
+				range = DEFAULT_RANGE;
 			}
-			for (Player to : new HashSet<Player>(recipients)) {
-				if (from.getWorld() != to.getWorld()
-						  || from.getLocation().distance(to.getLocation()) > range) {
-					recipients.remove(to);
+		} else if (event.hasFilter("yell")) {
+			range = YELL_RANGE;
+		}
+		if (range >= 0) {
+			for (final Iterator<Player> it = recipients.iterator(); it.hasNext();) {
+				final Player to = it.next();
+				if (from.getLocation().distance(to.getLocation()) > range) {
+					it.remove();
 				}
 			}
 		}
-		if (event.hasFilter("yell")) {
-			for (Player to : new HashSet<Player>(recipients)) {
-				if (from.getWorld() != to.getWorld()
-						  || from.getLocation().distance(to.getLocation()) > 300) {
-					recipients.remove(to);
-				}
-			}
-		}
-		if (event.hasFilter("world")) {
-			for (Player to : new HashSet<Player>(recipients)) {
-				if (from.getWorld() != to.getWorld()) {
-					recipients.remove(to);
-				}
-			}
-		}
-		if (event.hasFilter("server")) {
-			// Should really refresh the target list...
-		}
-		boolean isTell = event.hasFilter("tell");
+		final boolean isTell = event.hasFilter("tell");
 		if (isTell || event.hasFilter("reply")) {
-			Player to = Bukkit.getServer().getPlayer(
-					  isTell
-					  ? MMO.firstWord(event.getMessage())
-					  : tells.get(from.getName()));
+			final Player to = Bukkit.getServer().getPlayer(
+					isTell
+					? MMO.firstWord(event.getMessage())
+					: tells.get(from.getName()));
 			if (isTell) {
 				event.setMessage(MMO.removeFirstWord(event.getMessage()));
 			}
 			recipients.clear();
-			if (to != null) {
+			if (to == null) {
+				tells.remove(from.getName());
+				event.setCancelled(true);
+			} else {
 				tells.put(to.getName(), from.getName());
 				recipients.add(from);
 				recipients.add(to);
 				event.setFormat(to, event.getFormat().replaceAll("%2\\$s", "%2\\$s&f tells you"));
 				event.setFormat(from, event.getFormat().replaceAll("%2\\$s", "You tell " + MMO.getColor(from, to) + to.getName() + ChatColor.WHITE));
-			} else {
-				tells.remove(from.getName());
-				event.setCancelled(true);
 			}
 		}
 	}

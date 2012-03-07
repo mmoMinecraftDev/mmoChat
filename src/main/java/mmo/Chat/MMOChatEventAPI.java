@@ -16,30 +16,27 @@
  */
 package mmo.Chat;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import mmo.Core.ChatAPI.MMOChatEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
+import org.bukkit.event.HandlerList;
 
 public class MMOChatEventAPI extends Event implements MMOChatEvent {
 
+	protected static final HandlerList handlers = new HandlerList();
 	private final List<String> filters;
 	private final Map<Player, String> messages = new HashMap<Player, String>();
 	private final Map<Player, String> formats = new HashMap<Player, String>();
+	private final Map<String, String[]> args;
 	private final Set<Player> recipients;
 	protected Player player;
 	private String message;
 	private String format;
 	private boolean cancel = false;
-	private Map<String,String[]> args = null;
 
-	public MMOChatEventAPI(final Player player, final List<String> filters, final Map<String,String[]> args, final String format, final String message) {
-		super("mmoChatEvent");
+	public MMOChatEventAPI(final Player player, final List<String> filters, final Map<String, String[]> args, final String format, final String message) {
+		super();
 		this.recipients = new HashSet<Player>(Arrays.asList(player.getServer().getOnlinePlayers()));
 		this.player = player;
 		this.filters = filters;
@@ -49,31 +46,37 @@ public class MMOChatEventAPI extends Event implements MMOChatEvent {
 	}
 
 	@Override
-	public boolean hasFilter(String filter) {
+	public HandlerList getHandlers() {
+		return handlers;
+	}
+
+	public static HandlerList getHandlerList() {
+		return handlers;
+	}
+
+	@Override
+	public boolean hasFilter(final String filter) {
 		return filters.contains(filter.toLowerCase());
 	}
 
 	@Override
-	public void setMessage(Player player, String message) {
+	public void setMessage(final Player player, final String message) {
 		messages.put(player, message);
 	}
 
 	@Override
-	public String[] getArgs(String filter) {
+	public String[] getArgs(final String filter) {
 		return args.containsKey(filter) ? args.get(filter) : new String[0];
 	}
 
 	@Override
-	public void setMessage(String message) {
+	public void setMessage(final String message) {
 		this.message = message;
 	}
 
 	@Override
-	public String getMessage(Player player) {
-		if (messages.containsKey(player)) {
-			return messages.get(player);
-		}
-		return getMessage();
+	public String getMessage(final Player player) {
+		return messages.containsKey(player) ? messages.get(player) : getMessage();
 	}
 
 	@Override
@@ -82,12 +85,12 @@ public class MMOChatEventAPI extends Event implements MMOChatEvent {
 	}
 
 	@Override
-	public void setFormat(String format) {
+	public void setFormat(final String format) {
 		this.format = format;
 	}
 
 	@Override
-	public void setFormat(Player player, String format) {
+	public void setFormat(final Player player, final String format) {
 		formats.put(player, format);
 	}
 
@@ -97,11 +100,8 @@ public class MMOChatEventAPI extends Event implements MMOChatEvent {
 	}
 
 	@Override
-	public String getFormat(Player player) {
-		if (formats.containsKey(player)) {
-			return formats.get(player);
-		}
-		return getFormat();
+	public String getFormat(final Player player) {
+		return formats.containsKey(player) ? formats.get(player) : getFormat();
 	}
 
 	@Override
@@ -120,7 +120,7 @@ public class MMOChatEventAPI extends Event implements MMOChatEvent {
 	}
 
 	@Override
-	public void setCancelled(boolean cancel) {
+	public void setCancelled(final boolean cancel) {
 		this.cancel = cancel;
 	}
 }

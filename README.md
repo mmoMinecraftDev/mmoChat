@@ -2,7 +2,7 @@
 
 What is mmoMinecraft?
 ---------------------
-mmoMinecraft is an attempt to make an easy to configure and use suite of MMORPG related plugins for Spout and CraftBukkit based Minecarft servers.Server admin can install exactly which plugins they need
+mmoMinecraft is an attempt to make an easy to configure and use suite of MMORPG related plugins for Spout and CraftBukkit based Minecraft servers.Server admin can install exactly which plugins they need
 knowing that they won't interfere with each other, and that they aren't forced to have a feature they don't want in order to gain a feature they do want.
 
 Copyright &copy; 2011, mmoMinecraftDev <[Website]>
@@ -22,16 +22,17 @@ Compiling
 All mmoMinecraft projects use Maven to handle their dependencies.
 
 This requires Bukkit and other libraries (preferrably the latest version or source).
-* Install [Maven 2 or 3](http://maven.apache.org/download.html)
-* Checkout this repo and run: `mvn clean package`
+
+ * Install [Maven 2 or 3](http://maven.apache.org/download.html)
+ * Checkout this repo and run: `mvn clean package`
 
 Coding and Pull Request Formatting
 ----------------------------------
-* Generally follow the Oracle coding standards.
-* Use tabs, no spaces.
-* No 80 column limit or midstatement newlines.
-* Pull requests must compile and work.
-* Pull requests must be formatted properly.
+ * Generally follow the Oracle coding standards.
+ * Use tabs, no spaces.
+ * No 80 column limit or midstatement newlines.
+ * Pull requests must compile and work.
+ * Pull requests must be formatted properly.
 
 **Please follow the above conventions if you want your pull request(s) accepted.**
 

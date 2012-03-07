@@ -27,8 +27,8 @@ import mmo.Core.MMO;
 import mmo.Core.MMOPlugin;
 import mmo.Core.util.HashMapString;
 import org.bukkit.ChatColor;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.util.config.Configuration;
 
 public class ChatAPI implements Chat {
 
@@ -44,7 +44,7 @@ public class ChatAPI implements Chat {
 	final static HashMapString<String> playerChannel = new HashMapString<String>();
 	final static HashMapString<List<String>> playerHidden = new HashMapString<List<String>>();
 	static MMOPlugin plugin;
-	static Configuration cfg;
+	static FileConfiguration cfg;
 
 	public void addChannel(String name) {
 		if (!channelList.contains(name)) {
@@ -64,7 +64,7 @@ public class ChatAPI implements Chat {
 		if (chan == null) {
 			chan = getChannel(from);
 		}
-		String channel = channelList.get(chan);
+		final String channel = channelList.get(chan);
 		if (!cfg.getBoolean("channel." + channel + ".enabled", true) || !useChannel(from, channel)) {
 			// Report it as unknown if no permission or it's disabled
 			plugin.sendMessage(from, "Unknown channel: %s", chan);
@@ -87,20 +87,20 @@ public class ChatAPI implements Chat {
 		if (format == null) {
 			format = me ? "[%1$s] * %2$s %4$s" : "[%1$s] %2$s: %4$s";
 		}
-		List<String> filters = new ArrayList<String>();
-		Map<String,String[]> args = new HashMap<String,String[]>();
-		List<String> filterlist = cfg.getStringList("channel." + channel + ".filters", new ArrayList<String>());
+		final List<String> filters = new ArrayList<String>();
+		final Map<String, String[]> args = new HashMap<String, String[]>();
+		final List<String> filterlist = cfg.getStringList("channel." + channel + ".filters");
 		if (filterlist.isEmpty()) {
 			filterlist.add(cfg.getString("channel." + channel + ".filters", "Server"));
 		}
 		for (String filter : filterlist) {
-			String name = MMO.firstWord(filter).toLowerCase();
+			final String name = MMO.firstWord(filter).toLowerCase();
 			filters.add(name);
 			args.put(name, MMO.smartSplit(MMO.removeFirstWord(filter)));
 		}
-		MMOChatEventAPI event = new MMOChatEventAPI(from, filters, args, format, message);
+		final MMOChatEventAPI event = new MMOChatEventAPI(from, filters, args, format, message);
 		plugin.getServer().getPluginManager().callEvent(event);
-		Set<Player> recipients = event.getRecipients();
+		final Set<Player> recipients = event.getRecipients();
 		if (event.isCancelled() || recipients.isEmpty()) {
 			plugin.sendMessage(from, "You seem to be talking to yourself...");
 		} else {
@@ -110,7 +110,7 @@ public class ChatAPI implements Chat {
 			for (Player to : recipients) {
 				String msg = event.getMessage(to);
 				if (msg != null && !msg.isEmpty() && seeChannel(to, channel)) {
-					String fmt = event.getFormat(to).replaceAll("(?:&)([a-fA-F0-9])", "\u00A7$1");
+					final String fmt = event.getFormat(to).replaceAll("(?:&)([a-fA-F0-9])", "\u00A7$1");
 					if (MMOChat.config_default_color) {
 						msg = msg.replaceAll("(?:&)([a-fA-F0-9])", "\u00A7$1");
 					} else {
@@ -239,6 +239,7 @@ public class ChatAPI implements Chat {
 
 	/**
 	 * Load the default channel for a player
+	 *
 	 * @param player
 	 */
 	public void load(Player player) {
@@ -248,6 +249,7 @@ public class ChatAPI implements Chat {
 
 	/**
 	 * Free a player's default channel
+	 *
 	 * @param player
 	 */
 	public void unload(String player) {
