@@ -16,26 +16,22 @@
  */
 package mmo.Chat;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import mmo.Core.ChatAPI.Chat;
-import mmo.Core.util.ArrayListString;
 import mmo.Core.MMO;
 import mmo.Core.MMOPlugin;
+import mmo.Core.util.ArrayListString;
 import mmo.Core.util.HashMapString;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
-public class ChatAPI implements Chat {
+final public class ChatAPI implements Chat {
 
 	private ChatAPI() { // Prevent instantiation
 	}
 	/**
-	 * Singleton instance
+	 * Singleton instance.
 	 */
 	public final static ChatAPI instance = new ChatAPI();
 	// ...and now the class...
@@ -43,16 +39,28 @@ public class ChatAPI implements Chat {
 	final static HashMapString<String> aliasList = new HashMapString<String>();
 	final static HashMapString<String> playerChannel = new HashMapString<String>();
 	final static HashMapString<List<String>> playerHidden = new HashMapString<List<String>>();
+	final static String PERM_PREFIX = "mmo.chat.";
 	static MMOPlugin plugin;
 	static FileConfiguration cfg;
 
-	public void addChannel(String name) {
-		if (!channelList.contains(name)) {
+	/**
+	 * Add a channel.
+	 *
+	 * @param name to add
+	 */
+	public void addChannel(final String name) {
+		if (!isChannel(name)) {
 			channelList.add(name);
 		}
 	}
 
-	public void addAlias(String channel, String alias) {
+	/**
+	 * Add an alias for a channel.
+	 *
+	 * @param channel to find
+	 * @param alias to add
+	 */
+	public void addAlias(final String channel, final String alias) {
 		addChannel(channel);
 		if (!aliasList.containsKey(alias)) {
 			aliasList.put(alias, channel);
@@ -128,7 +136,7 @@ public class ChatAPI implements Chat {
 	}
 
 	@Override
-	public boolean hideChannel(Player player, String channel) {
+	public boolean hideChannel(final Player player, final String channel) {
 		if (channelList.contains(channel)) {
 			List<String> list = playerHidden.get(player.getName());
 			if (list == null) {
@@ -144,7 +152,7 @@ public class ChatAPI implements Chat {
 	}
 
 	@Override
-	public boolean showChannel(Player player, String channel) {
+	public boolean showChannel(final Player player, final String channel) {
 		if (channelList.contains(channel)) {
 			List<String> list = playerHidden.get(player.getName());
 			if (list == null) {
@@ -160,7 +168,7 @@ public class ChatAPI implements Chat {
 	}
 
 	@Override
-	public boolean seeChannel(Player player, String channel) {
+	public boolean seeChannel(final Player player, final String channel) {
 		if (playerHidden.containsKey(player.getName())) {
 			for (String chan : playerHidden.get(player.getName())) {
 				if (channel.equalsIgnoreCase(chan)) {
@@ -168,38 +176,38 @@ public class ChatAPI implements Chat {
 				}
 			}
 		}
-		String[] perms = {
-			"mmo.chat." + channel + ".see",
-			"mmo.chat.*.see",
-			"mmo.chat." + channel,
-			"mmo.chat.*"};
+		final String[] perms = {
+			channel + ".see",
+			"*.see",
+			channel,
+			"*"};
 		for (String perm : perms) {
-			if (player.isPermissionSet(perm)) {
-				return player.hasPermission(perm);
+			if (player.isPermissionSet(PERM_PREFIX + perm)) {
+				return player.hasPermission(PERM_PREFIX + perm);
 			}
 		}
 		return true;
 	}
 
 	@Override
-	public boolean useChannel(Player player, String channel) {
-		String[] perms = {
-			"mmo.chat." + channel + ".use",
-			"mmo.chat.*.use",
-			"mmo.chat." + channel,
-			"mmo.chat.*"};
+	public boolean useChannel(final Player player, final String channel) {
+		final String[] perms = {
+			channel + ".use",
+			"*.use",
+			channel,
+			"*"};
 		for (String perm : perms) {
-			if (player.isPermissionSet(perm)) {
-				return player.hasPermission(perm);
+			if (player.isPermissionSet(PERM_PREFIX + perm)) {
+				return player.hasPermission(PERM_PREFIX + perm);
 			}
 		}
 		return true;
 	}
 
 	@Override
-	public boolean setChannel(Player player, String channel) {
+	public boolean setChannel(final Player player, final String channel) {
 		String name = player.getName();
-		if (channelList.contains(channel)) {
+		if (isChannel(channel)) {
 			playerChannel.put(name, channel);
 			plugin.setString(player, "channel", channel);
 			return true;
@@ -208,7 +216,7 @@ public class ChatAPI implements Chat {
 	}
 
 	@Override
-	public String findChannel(String channel) {
+	public String findChannel(final String channel) {
 		if (channelList.contains(channel)) {
 			return channelList.get(channel);
 		}
@@ -219,15 +227,12 @@ public class ChatAPI implements Chat {
 	}
 
 	@Override
-	public boolean isChannel(String channel) {
-		if (channelList.contains(channel)) {
-			return true;
-		}
-		return false;
+	public boolean isChannel(final String channel) {
+		return channelList.contains(channel);
 	}
 
 	@Override
-	public String getChannel(Player player) {
+	public String getChannel(final Player player) {
 		String channel = playerChannel.get(player.getName());
 		channel = channel == null ? cfg.getString("default.channel", "Chat") : channel;
 		if (!channelList.contains(channel)) {
@@ -238,21 +243,21 @@ public class ChatAPI implements Chat {
 	}
 
 	/**
-	 * Load the default channel for a player
+	 * Load the default channel for a player.
 	 *
-	 * @param player
+	 * @param player to load
 	 */
-	public void load(Player player) {
+	public void load(final Player player) {
 		playerChannel.put(player.getName(), plugin.getString(player, "channel", cfg.getString("default.channel", "Chat")));
 		playerHidden.put(player.getName(), plugin.getStringList(player, "hidden", new ArrayList<String>()));
 	}
 
 	/**
-	 * Free a player's default channel
+	 * Free a player's default channel.
 	 *
-	 * @param player
+	 * @param player to unload
 	 */
-	public void unload(String player) {
+	public void unload(final String player) {
 		playerChannel.remove(player);
 		playerHidden.remove(player);
 	}
