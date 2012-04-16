@@ -1,8 +1,8 @@
 name: mmoChat
 main: mmo.Chat.MMOChat
-version: 1.8
+version: 1.9
 website: http://forums.bukkit.org/threads/
-author: Rycochet <rycochet@rycochet.com>
+author: Rycochet <rycochet@rycochet.com>, Zidane, Dockter
 depend: [Spout,mmoCore]
 
 description: Utility functions for mmo-minecraft
