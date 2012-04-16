@@ -36,6 +36,8 @@ public class Channels implements Listener {
 
 	@EventHandler
 	public void onMMOChat(final MMOChatEvent event) {
+		Player player = event.getPlayer();
+		
 		final Player from = event.getPlayer();
 		final Set<Player> recipients = event.getRecipients();
 		if (event.hasFilter("disabled")) {
