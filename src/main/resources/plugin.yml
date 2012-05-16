@@ -1,28 +1,28 @@
 name: mmoChat
-main: mmo.Chat.MMOChat
-version: 1.8
-website: http://forums.bukkit.org/threads/
-author: Rycochet <rycochet@rycochet.com>
-depend: [Spout,mmoCore]
+version: ${releaseVersion} b${buildNumber}
+description: Provides simple chat formatting and channel handling for players.
+author: mmoMinecraftDev
+website: http://mmo.me.uk
 
-description: Utility functions for mmo-minecraft
+main: mmo.Chat.MMOChat
+depend: [Spout, mmoCore]
 
 commands:
-  channel:
-    description: Turn on or off channels, or set the default channel for speaking
-    aliases: [ch,mmochat]
-    usage: /channel <name>
+    channel:
+        description: Turn on or off channels, or set the default channel for speaking
+        aliases: [ch, mmochat]
+        usage: /channel <name>
 
 permissions:
-  mmo.chat:
-    description: Access to all the mmoChat channel nodes
-    default: true
-  mmo.chat.*:
-    description: Read/write access to channels
-    default: true
-  mmo.chat.*.use:
-    description: Write access to channels
-    default: true
-  mmo.chat.*.see:
-    description: Read access to channels
-    default: true
+    mmo.chat:
+        description: Access to all the mmoChat channel nodes
+        default: true
+    mmo.chat.*:
+        description: Read/write access to channels
+        default: true
+    mmo.chat.*.use:
+        description: Write access to channels
+        default: true
+    mmo.chat.*.see:
+        description: Read access to channels
+        default: true
