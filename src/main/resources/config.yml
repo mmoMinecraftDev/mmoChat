@@ -1,0 +1,64 @@
+# #Chat Configuration
+default:
+  colour: false
+  channel: Chat
+  format: '%2$s: %4$s'
+  formatme: ' * %2$s %4$s'
+replace_vanilla_chat: true
+channel:
+  Shout:
+    enabled: false
+    command: true
+    log: true
+    filters: World
+  Say:
+    enabled: false
+    command: true
+    log: true
+    filters: Say
+  Party:
+    enabled: true
+    command: false
+    log: false
+    filters: Party
+    format: '[%1$s] %2$s: &3%4$s'
+    formatme: '[%1$s] * %2$s &3%4$s'
+  Chat:
+    enabled: true
+    command: true
+    log: true
+    filters: Server
+  Mod:
+    enabled: true
+    command: true
+    log: true
+    filters: Server
+    format: '&9[%1$s] &6%2$s: &9%4$s'
+    formatme: '&9[%1$s] * &6%2$s &9%4$s'
+  Tell:
+    alias:
+    - t
+    enabled: true
+    command: true
+    log: false
+    filters: Tell
+    format: '&b[%1$s] &6%2$s: &b%4$s'
+    formatme: '&b[%1$s] * &6%2$s &b%4$s'
+  Reply:
+    alias:
+    - r
+    enabled: true
+    command: true
+    log: false
+    filters: Reply
+    format: '&d[%1$s] &6%2$s: &d%4$s'
+    formatme: '&d[%1$s] * &6%2$s &d%4$s'
+  Admin:
+    alias:
+    - a
+    enabled: true
+    command: true
+    log: true
+    filters: Server
+    format: '&c[%1$s] &6%2$s: &c%4$s'
+    formatme: '&c[%1$s] * &6%2$s &c%4$s'

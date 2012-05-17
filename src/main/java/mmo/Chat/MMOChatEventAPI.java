@@ -19,10 +19,11 @@ package mmo.Chat;
 import java.util.*;
 import mmo.Core.ChatAPI.MMOChatEvent;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class MMOChatEventAPI extends Event implements MMOChatEvent {
+public class MMOChatEventAPI extends Event implements Cancellable {
 
 	protected static final HandlerList handlers = new HandlerList();
 	private final List<String> filters;
@@ -45,7 +46,6 @@ public class MMOChatEventAPI extends Event implements MMOChatEvent {
 		this.message = message;
 	}
 
-	@Override
 	public HandlerList getHandlers() {
 		return handlers;
 	}
@@ -54,72 +54,58 @@ public class MMOChatEventAPI extends Event implements MMOChatEvent {
 		return handlers;
 	}
 
-	@Override
 	public boolean hasFilter(final String filter) {
 		return filters.contains(filter.toLowerCase());
 	}
 
-	@Override
 	public void setMessage(final Player player, final String message) {
 		messages.put(player, message);
 	}
 
-	@Override
 	public String[] getArgs(final String filter) {
 		return args.containsKey(filter) ? args.get(filter) : new String[0];
 	}
 
-	@Override
 	public void setMessage(final String message) {
 		this.message = message;
 	}
 
-	@Override
 	public String getMessage(final Player player) {
 		return messages.containsKey(player) ? messages.get(player) : getMessage();
 	}
 
-	@Override
 	public String getMessage() {
 		return message;
 	}
 
-	@Override
 	public void setFormat(final String format) {
 		this.format = format;
 	}
 
-	@Override
 	public void setFormat(final Player player, final String format) {
 		formats.put(player, format);
 	}
 
-	@Override
 	public String getFormat() {
 		return format;
 	}
 
-	@Override
 	public String getFormat(final Player player) {
 		return formats.containsKey(player) ? formats.get(player) : getFormat();
 	}
 
-	@Override
 	public Player getPlayer() {
 		return player;
 	}
 
-	@Override
 	public Set<Player> getRecipients() {
 		return recipients;
 	}
 
-	@Override
 	public boolean isCancelled() {
 		return cancel;
 	}
 
-	@Override
 	public void setCancelled(final boolean cancel) {
 		this.cancel = cancel;
 	}

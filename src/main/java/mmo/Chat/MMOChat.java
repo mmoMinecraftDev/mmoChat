@@ -20,6 +20,9 @@ import java.util.*;
 import mmo.Core.MMO;
 import mmo.Core.MMOMinecraft;
 import mmo.Core.MMOPlugin;
+import mmo.Core.MMOPlugin.Support;
+import mmo.Core.util.EnumBitSet;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -42,6 +45,12 @@ public class MMOChat extends MMOPlugin implements Listener {
 	static public boolean config_replace_vanilla_chat = true;
 
 	@Override
+	public EnumBitSet mmoSupport(EnumBitSet support) {
+		support.set(Support.MMO_AUTO_EXTRACT);
+		return support;
+	}
+			
+	@Override
 	public void onEnable() {
 		super.onEnable();
 		ChatAPI.plugin = this;
@@ -55,7 +64,6 @@ public class MMOChat extends MMOPlugin implements Listener {
 	public void loadConfiguration(final FileConfiguration cfg) {
 		if (cfg.contains("default_channel")) {
 			cfg.getString("default.channel", cfg.getString("default_channel", "Chat"));
-//			cfg.removeProperty("default_channel");
 		} else {
 			cfg.getString("default.channel", "Chat");
 		}
@@ -123,8 +131,7 @@ public class MMOChat extends MMOPlugin implements Listener {
 				}
 			}
 		}
-	}
-
+	}	
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if (!(sender instanceof Player)) {
@@ -157,7 +164,6 @@ public class MMOChat extends MMOPlugin implements Listener {
 		}
 		return false;
 	}
-
 	@Override
 	public List<Class<?>> getDatabaseClasses() {
 		List<Class<?>> list = new ArrayList<Class<?>>();
