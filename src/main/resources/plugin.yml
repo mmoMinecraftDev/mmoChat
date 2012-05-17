@@ -1,5 +1,5 @@
 name: mmoChat
-version: ${releaseVersion} b${buildNumber}
+version: ${releaseVersion}.${buildNumber}
 description: Provides simple chat formatting and channel handling for players.
 author: mmoMinecraftDev
 website: http://mmo.me.uk
