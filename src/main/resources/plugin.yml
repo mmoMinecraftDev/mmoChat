@@ -16,13 +16,13 @@ commands:
 permissions:
     mmo.chat:
         description: Access to all the mmoChat channel nodes
-        default: true
+        default: false
     mmo.chat.*:
         description: Read/write access to channels
-        default: true
+        default: false
     mmo.chat.*.use:
         description: Write access to channels
-        default: true
+        default: false
     mmo.chat.*.see:
         description: Read access to channels
-        default: true
+        default: false

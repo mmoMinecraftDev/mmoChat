@@ -186,7 +186,7 @@ final public class ChatAPI implements Chat {
 				return player.hasPermission(PERM_PREFIX + perm);
 			}
 		}
-		return true;
+		return false;
 	}
 
 	@Override
@@ -201,7 +201,7 @@ final public class ChatAPI implements Chat {
 				return player.hasPermission(PERM_PREFIX + perm);
 			}
 		}
-		return true;
+		return false;
 	}
 
 	@Override

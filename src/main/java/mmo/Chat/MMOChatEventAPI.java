@@ -23,9 +23,8 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class MMOChatEventAPI extends Event implements Cancellable {
+public class MMOChatEventAPI extends MMOChatEvent implements Cancellable {
 
-	protected static final HandlerList handlers = new HandlerList();
 	private final List<String> filters;
 	private final Map<Player, String> messages = new HashMap<Player, String>();
 	private final Map<Player, String> formats = new HashMap<Player, String>();
@@ -44,14 +43,6 @@ public class MMOChatEventAPI extends Event implements Cancellable {
 		this.args = args;
 		this.format = format;
 		this.message = message;
-	}
-
-	public HandlerList getHandlers() {
-		return handlers;
-	}
-
-	public static HandlerList getHandlerList() {
-		return handlers;
 	}
 
 	public boolean hasFilter(final String filter) {
