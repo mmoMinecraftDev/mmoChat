@@ -182,8 +182,8 @@ final public class ChatAPI implements Chat {
 			channel,
 			"*"};
 		for (String perm : perms) {
-			if (player.isPermissionSet(PERM_PREFIX + perm)) {
-				return player.hasPermission(PERM_PREFIX + perm);
+			if (player.isPermissionSet(PERM_PREFIX + perm) || player.isOp()) {
+				return player.hasPermission(PERM_PREFIX + perm) || player.isOp();
 			}
 		}
 		return false;
@@ -197,8 +197,8 @@ final public class ChatAPI implements Chat {
 			channel,
 			"*"};
 		for (String perm : perms) {
-			if (player.isPermissionSet(PERM_PREFIX + perm)) {
-				return player.hasPermission(PERM_PREFIX + perm);
+			if (player.isPermissionSet(PERM_PREFIX + perm) || player.isOp()) {
+				return player.hasPermission(PERM_PREFIX + perm) || player.isOp();
 			}
 		}
 		return false;

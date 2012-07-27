@@ -33,7 +33,7 @@ public class Channels implements Listener {
 	private static final int SAY_RANGE = 25;
 	private static final int YELL_RANGE = 300;
 	private static final int DEFAULT_RANGE = 100;
-
+	
 	@EventHandler
 	public void onMMOChat(final MMOChatEvent event) {
 		final Player from = event.getPlayer();
@@ -74,10 +74,15 @@ public class Channels implements Listener {
 		}
 		final boolean isTell = event.hasFilter("tell");
 		if (isTell || event.hasFilter("reply")) {
+			String who = tells.get(from.getName());
+			if(!isTell && who == null) {
+				event.setCancelled(true);
+				return;
+			}
 			final Player to = Bukkit.getServer().getPlayer(
 					isTell
 					? MMO.firstWord(event.getMessage())
-					: tells.get(from.getName()));
+					: who);
 			if (isTell) {
 				event.setMessage(MMO.removeFirstWord(event.getMessage()));
 			}
