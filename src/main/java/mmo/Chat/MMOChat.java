@@ -187,7 +187,7 @@ public class MMOChat extends MMOPlugin implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
-	public void onPlayerChat(final PlayerChatEvent event) {
+	public void onPlayerChat(final AsyncPlayerChatEvent event) {
 		if(event.isCancelled()) 			
 			return;
 		
