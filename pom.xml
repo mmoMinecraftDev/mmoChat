@@ -5,7 +5,7 @@
 	<name>mmoChat</name>
 	<groupId>mmo.Chat</groupId>
 	<artifactId>mmoChat</artifactId>
-	<version>1.9.5-SNAPSHOT</version>
+	<version>1.9.6-SNAPSHOT</version>
 	<url>http://github.com/mmoMinecraftDev/mmoChat</url>
 	<description>Provides simple chat formatting and channel handling for players.</description>
 

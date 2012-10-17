@@ -144,9 +144,11 @@ public class MMOChat extends MMOPlugin implements Listener {
 				if (args.length > 1) {
 					if (args[1].equalsIgnoreCase("hide")) {
 						chat.hideChannel(player, channel);
+						sendMessage(player, "Channel: " + channel + " now hidden.");
 						return true;
 					} else if (args[1].equalsIgnoreCase("show")) {
-						chat.hideChannel(player, channel);
+						chat.showChannel(player, channel);
+						sendMessage(player, "Channel: " + channel + " now viewable.");
 						return true;
 					}
 				} else {
