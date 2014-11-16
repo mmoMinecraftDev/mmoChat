@@ -32,15 +32,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.*;
-import org.getspout.spoutapi.event.screen.ScreenCloseEvent;
-import org.getspout.spoutapi.event.screen.ScreenOpenEvent;
-import org.getspout.spoutapi.gui.*;
-import org.getspout.spoutapi.player.SpoutPlayer;
 
 public class MMOChat extends MMOPlugin implements Listener {
 
 	static final ChatAPI chat = ChatAPI.instance;
-	static final HashMap<Player, Widget> chatbar = new HashMap<Player, Widget>();
+	//static final HashMap<Player, Widget> chatbar = new HashMap<Player, Widget>();
 	static public boolean config_default_color = false;
 	static public boolean config_replace_vanilla_chat = true;
 
@@ -215,6 +211,7 @@ public class MMOChat extends MMOPlugin implements Listener {
 		}
 	}
 
+	/*
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onScreenOpen(final ScreenOpenEvent event) {
 		if (!event.isCancelled() && event.getScreenType() == ScreenType.CHAT_SCREEN) {
@@ -243,5 +240,5 @@ public class MMOChat extends MMOPlugin implements Listener {
 				bar.setVisible(false);
 			}
 		}
-	}
+	} */
 }

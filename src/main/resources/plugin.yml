@@ -5,7 +5,7 @@ author: mmoMinecraftDev
 website: http://mmo.me.uk
 
 main: mmo.Chat.MMOChat
-depend: [Spout, mmoCore]
+depend: [mmoCore]
 
 commands:
     channel:

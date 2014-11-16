@@ -5,15 +5,14 @@
 	<name>mmoChat</name>
 	<groupId>mmo.Chat</groupId>
 	<artifactId>mmoChat</artifactId>
-	<version>2.0-SNAPSHOT</version>
+	<version>3.0</version>
 	<url>http://github.com/mmoMinecraftDev/mmoChat</url>
 	<description>Provides simple chat formatting and channel handling for players.</description>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	<bukkitVersion>1.4.5-R0.2</bukkitVersion>
-    <spoutVersion>dev-SNAPSHOT</spoutVersion>
-	<coreVersion>2.5-SNAPSHOT</coreVersion>
+	<bukkitVersion>1.6.2-R1.0</bukkitVersion>    
+	<coreVersion>3.0</coreVersion>
 	<buildNumber>0</buildNumber>
 	</properties>
 
@@ -60,13 +59,7 @@
 			<artifactId>bukkit</artifactId>
 			<version>${bukkitVersion}</version>
 			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.getspout</groupId>
-			<artifactId>spoutplugin</artifactId>
-			<version>${spoutVersion}</version>
-			<scope>provided</scope>
-		</dependency>
+		</dependency>		
 		<dependency>
 			<groupId>mmo.Core</groupId>
 			<artifactId>mmoCore</artifactId>

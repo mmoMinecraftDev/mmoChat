@@ -113,7 +113,7 @@ final public class ChatAPI implements Chat {
 			plugin.sendMessage(from, "You seem to be talking to yourself...");
 		} else {
 			if (cfg.getBoolean("channel." + channel + ".log", false)) {
-				plugin.log("[%1$s] %2$s: %3$s", channel, from.getName(), message);
+				plugin.log("[%1$s] %2$s: %3$s", channel, from.getName(), message);				
 			}
 			for (Player to : recipients) {
 				String msg = event.getMessage(to);
